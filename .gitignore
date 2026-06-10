@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local virtualenvs / editor configs
+.venv/
+.idea/
+.vscode/
+
+# Project planning / design notes (kept local only)
+docs/

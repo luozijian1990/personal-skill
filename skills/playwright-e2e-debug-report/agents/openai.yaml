@@ -1,0 +1,4 @@
+interface:
+  display_name: "Playwright E2E 测试报告"
+  short_description: "HITL Playwright 测试与报告"
+  default_prompt: "使用 $playwright-e2e-debug-report 基于 design/tasks 生成测试任务，经 HITL 确认后运行 Playwright E2E 并输出报告。"

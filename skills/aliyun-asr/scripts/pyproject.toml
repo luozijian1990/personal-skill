@@ -1,0 +1,16 @@
+[project]
+name = "aliyun-asr"
+version = "0.1.0"
+description = "阿里云录音文件识别闲时版批量 CLI"
+requires-python = ">=3.9"
+dependencies = ["aliyun-python-sdk-core==2.13.3"]
+
+[project.scripts]
+aliyun-asr = "aliyun_asr:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["aliyun_asr"]
