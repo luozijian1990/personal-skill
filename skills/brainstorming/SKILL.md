@@ -98,7 +98,7 @@ For Design Mode, and for Refinement Mode when the user wants implementation work
 4. **Judge scope** — single-function or multi-function? (see Scope Judgment above)
 5. **Present design** — using SDD templates, get user approval:
    - Multi-function: output proposal.md (按 @references/proposal.template.md) + design.md (按 @references/design.template.md)
-   - Single-function: output simplified design.md only (Context + Goals + Non-Goals, skip Decisions and Risks)
+   - Single-function: output simplified design.md only (Context + Goals + Non-Goals + Acceptance Criteria, skip Decisions and Risks)
 6. **Write design docs** — save to `docs/plans/`:
    - `docs/plans/YYYY-MM-DD-<topic>-proposal.md` (multi-function only)
    - `docs/plans/YYYY-MM-DD-<topic>-design.md` (always)
@@ -174,8 +174,18 @@ Output two documents following the SDD templates:
 - **Context** — current architecture and behavior before changes
 - **Goals** — what to achieve, in verifiable language
 - **Non-Goals** — what NOT to do (most important section for AI boundary control)
+- **Acceptance Criteria** — automated completion contract, numbered AC1/AC2/AC3
 - **Decisions** — each with "选择 + 理由", explain why alternatives were rejected
 - **Risks / Trade-offs** — each with specific scenario and mitigation
+
+Acceptance Criteria rules:
+- Each item MUST be behavior-level or outcome-level, not an implementation step.
+- Cover core functionality, regression boundaries, failure scenarios, and critical non-goals.
+- Write each item so a later verification task can clearly prove pass/fail with automated tests.
+- Prefer unit tests, service tests, API tests, and isolated integration tests using mocks/fixtures.
+- Do NOT make real external systems part of the default completion contract. Helm, Kubernetes, Git pushes, production databases, paid APIs, and other side-effecting systems should be verified by mocks/spies or recorded as rollout smoke notes.
+- Do NOT include Playwright/E2E as the default proof method. Use Playwright only when the user explicitly asks for it or the feature's main risk is browser behavior that cannot be covered by lower-level tests. Dedicated real-browser E2E belongs in the playwright-e2e-debug-report flow.
+- If a business outcome cannot be proved without real external systems, write the automatable contract first and move the real-environment check to rollout/manual verification notes instead of normal Acceptance Criteria.
 
 Ask after each section whether it looks right so far. Be ready to go back and revise.
 
@@ -185,6 +195,7 @@ Output simplified design.md only:
 - **Context** — 1-2 sentences on current state
 - **Goals** — what to achieve
 - **Non-Goals** — what NOT to do (still required even for simple tasks)
+- **Acceptance Criteria** — 2-4 numbered AC items defining automated pass/fail
 
 Skip Decisions and Risks sections.
 
@@ -209,4 +220,5 @@ Skip Decisions and Risks sections.
 - **Incremental validation** - Present design, get approval before moving on
 - **Be flexible** - Go back and clarify when something doesn't make sense
 - **Non-Goals are critical** - Always list what NOT to do, even for simple tasks. This prevents AI from "helpfully" doing extra work that breaks things.
+- **Acceptance Criteria are the automated completion contract** - Unit/service/API tests are the default proof method; real-environment smoke checks are rollout notes unless explicitly requested.
 - **Decisions need rationale** - Not just "chose A", but "chose A because B would cause X problem". Trap knowledge is the most valuable part of design.md.

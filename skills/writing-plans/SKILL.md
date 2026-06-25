@@ -7,7 +7,7 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 ## Overview
 
-Based on the design.md from brainstorming, generate a structured tasks.md that breaks the design into atomic, executable tasks. Each task is a pseudocode-level description with explicit constraints — no inline implementation code, no inline test code.
+Based on the design.md from brainstorming, generate a structured tasks.md that breaks the design into atomic, executable tasks and preserves the design's Acceptance Criteria through final verification. Each task is a pseudocode-level description with explicit constraints — no inline implementation code, no inline test code.
 
 Assume the executor (AI or human) is a skilled developer but knows nothing about this specific codebase. The tasks.md gives them the full picture: what to do, in what order, with what constraints.
 
@@ -63,10 +63,11 @@ Assume the executor (AI or human) is a skilled developer but knows nothing about
 - [ ] 3.2 {{辅助方法：查 table.field，条件 → 返回 true}}
 - [ ] 3.3 {{重写方法：条件A → handler 委托；条件B → super}}
 
-## N. 验证
+## N. 整体验收
 
 - [ ] N.1 执行编译/构建确认无错误
-- [ ] N.2 {{其他验证}}
+- [ ] N.2 {{执行单元测试/服务层测试/API 测试，覆盖 AC1、AC3}}
+- [ ] N.3 {{执行失败场景/回归边界自动化测试，覆盖 AC2、AC4}}
 ````
 
 ### Key Rules for Task Descriptions
@@ -80,7 +81,10 @@ Assume the executor (AI or human) is a skilled developer but knows nothing about
   - `"从 X 获取，不从 Y 获取"` — data source constraint
 - **Group by module/file**, not flat numbering
 - **Dependency order** within each group
-- **Last group is always verification** (compile, test, smoke test)
+- **Last group is always 整体验收** (compile/build, unit/service/API tests, AC coverage)
+- **Verification tasks cite AC IDs** where applicable, e.g. "覆盖 AC1、AC3"
+- **Unit/service/API tests are the default verification method.** Use mocks, spies, and fixtures for external systems.
+- **Do NOT add Playwright/E2E by default.** Only include it when the user explicitly asked for Playwright/E2E or the design states browser behavior is the primary risk. Dedicated real-browser E2E belongs in the playwright-e2e-debug-report flow.
 
 ## Decision→Task Mapping Check
 
@@ -102,6 +106,30 @@ Decision→Task 映射检查：
   ...
 ```
 
+## Acceptance→Verification Mapping Check
+
+**After generating tasks.md, you MUST perform this self-check:**
+
+For each Acceptance Criterion in design.md:
+1. Is there at least one task in the final 整体验收 group that verifies this AC?
+2. Is the verification method explicit and automated by default: unit test, service test, API test, isolated integration test, or build check?
+3. Does the verification task cite the covered AC IDs directly, e.g. "覆盖 AC1、AC3"?
+4. Are external systems such as Helm, Kubernetes, Git pushes, production databases, paid APIs, and third-party services mocked/spied instead of invoked for normal task verification?
+5. If an AC cannot be verified without real external systems, is the automatable portion mapped to tests and the real-environment check recorded as an Open Question or rollout/manual verification note?
+6. Is Playwright/E2E excluded unless explicitly requested by the user or required by the design? If needed, record that it should be handled by the playwright-e2e-debug-report flow, not as a default tasks.md verification command.
+
+**If any AC is missing verification coverage, fix the 整体验收 group before saving.**
+
+Report the mapping check result to the user:
+```
+Acceptance→Verification 映射检查：
+  AC1 (xxx) → Task 4.2 ✓ (单元测试)
+  AC2 (xxx) → Task 4.3 ✓ (服务层测试，mock Helm)
+  AC3 (xxx) → Task 4.4 ✓ (API 失败场景测试)
+  AC4 (xxx) → Open Question / Rollout: 真实集群 smoke 需人工确认，不作为默认任务验收
+  ...
+```
+
 ## 语言与状态要求
 
 - **所有 tasks.md 文档必须用中文撰写**（标题、描述、步骤说明均用中文，代码和命令保持原文）
@@ -114,7 +142,9 @@ Decision→Task 映射检查：
 - Constraints explicit in task description, not hidden in comments
 - Group by module, not flat numbering
 - Reference design.md for rationale
-- Last group is always verification
+- Last group is always 整体验收
+- Every Acceptance Criterion in design.md must map to at least one verification task or an explicit Open Question
+- Default verification is automated unit/service/API testing; Playwright/E2E is opt-in and usually belongs to playwright-e2e-debug-report
 
 ## Execution Handoff
 
