@@ -13,3 +13,6 @@ __pycache__/
 
 # Project planning / design notes (kept local only)
 docs/
+!docs/
+docs/*
+!docs/DEVELOPMENT_WORKFLOW.md

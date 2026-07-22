@@ -23,48 +23,31 @@
 | 主要本地改动 | 与上游对比可确认的关键差异（保守描述，不虚构） |
 | 上游 LICENSE | `THIRD_PARTY_LICENSES/` 中保留的文件名 |
 
-审计日期：2026-06-10。
+审计日期：2026-07-22。
 
 ## 第三方 Skill 审计表
 
-### 1. obra/superpowers（MIT，Copyright (c) 2025 Jesse Vincent）
+### 1. mattpocock/skills（MIT）
 
-下列 Skill 来源同一上游仓库，统一引用 `THIRD_PARTY_LICENSES/obra-superpowers-LICENSE.txt`。
+下列精选 Skill 来源于 [mattpocock/skills](https://github.com/mattpocock/skills)，统一引用 `THIRD_PARTY_LICENSES/mattpocock-skills-LICENSE.txt`。本地保留了个人使用的 13 个 Skill，并将 `diagnosing-bugs` 中不存在的架构改进入口改为本仓库同时收录的 `codebase-design`；开发工作流说明见 `docs/DEVELOPMENT_WORKFLOW.md`。
 
-| Skill | 上游路径（main 分支） | 收录方式 | 主要本地改动 |
-|---|---|---|---|
-| `dispatching-parallel-agents` | `skills/dispatching-parallel-agents/` | 原样收录 | 未做内容改动 |
-| `executing-plans` | `skills/executing-plans/` | 改编 | 在 Step 2 增加“立即更新 plan 文件中该 task 状态字段”的中文执行约定；其余流程保持上游一致 |
-| `finishing-a-development-branch` | `skills/finishing-a-development-branch/` | 原样收录 | 未做内容改动 |
-| `receiving-code-review` | `skills/receiving-code-review/` | 原样收录 | 未做内容改动 |
-| `subagent-driven-development` | `skills/subagent-driven-development/` | 原样收录 | 未做内容改动 |
-| `systematic-debugging` | `skills/systematic-debugging/` | 原样收录 | 未做内容改动 |
-| `test-driven-development` | `skills/test-driven-development/` | 原样收录 | 未做内容改动 |
-| `using-git-worktrees` | `skills/using-git-worktrees/` | 原样收录 | 未做内容改动 |
-| `using-superpowers` | `skills/using-superpowers/` | 原样收录 | 未做内容改动 |
-| `verification-before-completion` | `skills/verification-before-completion/` | 原样收录 | 未做内容改动 |
-| `writing-skills` | `skills/writing-skills/` | 原样收录 | 未做内容改动 |
+| Skill | 上游路径（以仓库当前结构为准） | 收录方式 |
+|---|---|---|
+| `code-review` | `skills/engineering/code-review/` | 精选收录 |
+| `codebase-design` | `skills/engineering/codebase-design/` | 精选收录 |
+| `diagnosing-bugs` | `skills/engineering/diagnosing-bugs/` | 改编 |
+| `domain-modeling` | `skills/engineering/domain-modeling/` | 精选收录 |
+| `grill-me` | `skills/productivity/grill-me/` | 精选收录 |
+| `grill-with-docs` | `skills/productivity/grill-with-docs/` | 精选收录 |
+| `grilling` | `skills/productivity/grilling/` | 精选收录 |
+| `handoff` | `skills/productivity/handoff/` | 精选收录 |
+| `setup-matt-pocock-skills` | `skills/engineering/setup-matt-pocock-skills/` | 精选收录 |
+| `tdd` | `skills/engineering/tdd/` | 精选收录 |
+| `teach` | `skills/learning/teach/` | 精选收录 |
+| `to-spec` | `skills/engineering/to-spec/` | 精选收录 |
+| `to-tickets` | `skills/engineering/to-tickets/` | 精选收录 |
 
-### 2. obra/superpowers + mattpocock/skills 混合改编
-
-| Skill | 上游 A | 上游 B | 许可证 | 收录方式 | 主要本地改动 |
-|---|---|---|---|---|---|
-| `brainstorming` | `obra/superpowers`：`skills/brainstorming/` | `mattpocock/skills`：`skills/productivity/grill-me/` | 两者均 MIT | 混合改编 | 在 obra `brainstorming` 基础上整合 mattpocock `grill-me` 的“Grill Mode”交互模式；引入 SDD 风格的 `proposal.md` / `design.md` 模板与 Mode Selection 决策；保留 HARD-GATE 实施前审批的约束 |
-
-上游 LICENSE：
-- `THIRD_PARTY_LICENSES/obra-superpowers-LICENSE.txt`
-- `THIRD_PARTY_LICENSES/mattpocock-skills-LICENSE.txt`
-
-### 3. obra/superpowers 独立改编
-
-| Skill | 上游路径 | 许可证 | 收录方式 | 主要本地改动 |
-|---|---|---|---|---|
-| `requesting-code-review` | `skills/requesting-code-review/` | MIT | 改编 | 增加评分机制与 review 模板的本地化调整（与上游对比可确认的差异，详细 diff 以仓库实际内容为准） |
-| `writing-plans` | `skills/writing-plans/` | MIT | 改编 | 增加 tasks 模板、Decision→Task 映射校验等本地化补充 |
-
-上游 LICENSE：`THIRD_PARTY_LICENSES/obra-superpowers-LICENSE.txt`。
-
-### 4. 其他第三方 Skill（上游许可证明确）
+### 2. 其他第三方 Skill（上游许可证明确）
 
 | Skill | 上游仓库 | 上游路径 | 上游分支 | 许可证 | 收录方式 | 主要本地改动 | 上游 LICENSE |
 |---|---|---|---|---|---|---|---|
@@ -74,7 +57,7 @@
 | `grafana-dashboards` | `wshobson/agents` | `plugins/observability-monitoring/skills/grafana-dashboards/` | main | MIT, Copyright (c) 2024 Seth Hobson | 原样收录 | 未做内容改动 | `THIRD_PARTY_LICENSES/wshobson-agents-LICENSE.txt` |
 | `playwright-cli` | `microsoft/playwright-cli` | `skills/playwright-cli/` | main | Apache-2.0, Copyright (c) Microsoft Corporation | 原样收录 | 未做内容改动 | `THIRD_PARTY_LICENSES/microsoft-playwright-cli-LICENSE.txt` |
 
-### 5. 上游无 LICENSE 文件但本仓库选择收录
+### 3. 上游无 LICENSE 文件但本仓库选择收录
 
 仓库所有者在**知悉法律默认"All Rights Reserved"风险**的前提下选择收录下列 Skill。本节如实披露真实状态，**不构成对再分发授权的确认**，使用者需自行评估法律风险。本仓库未对任何文件追加不实的许可证声明，也未在 `THIRD_PARTY_LICENSES/` 下创建虚构的 LICENSE 文件。
 
@@ -85,7 +68,7 @@
 | `darwin-skill` | `alchaincyf/darwin-skill` | 仓库根目录 | master 存在 README，根目录无 LICENSE 文件 | `LICENSE` / `LICENSE.md` / `LICENSE.txt` / `License` / `COPYING` 均 HTTP 404 | `README.md` 出现 `License: MIT` 徽章（指向不存在的 `LICENSE` 文件），按本仓库审计规则**不以徽章替代许可证正文** | 仓库所有者选择收录，风险自担 |
 
 后续追加授权时的处理：
-- 若上游补充了正式 LICENSE 文件，将其复制到 `THIRD_PARTY_LICENSES/JimLiu-baoyu-skills-LICENSE.txt` 或 `THIRD_PARTY_LICENSES/alchaincyf-darwin-skill-LICENSE.txt`，并在第 4 节追加条目。
+- 若上游补充了正式 LICENSE 文件，将其复制到 `THIRD_PARTY_LICENSES/JimLiu-baoyu-skills-LICENSE.txt` 或 `THIRD_PARTY_LICENSES/alchaincyf-darwin-skill-LICENSE.txt`，并在本节后追加条目。
 - 若上游作者通过 issue、邮件或社交平台明确授权再分发，将证据归档到本仓库的 `docs/permissions/` 下，并在本表"上游 README 许可证声明"列改为"作者书面授权（见 docs/permissions/...）"。
 - 在上述任何一种情况落地之前，本表保持现状。
 

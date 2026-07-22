@@ -10,6 +10,7 @@ git clone https://github.com/luozijian1990/personal-skill.git
 
 - 全部 Skill 位于 `skills/` 目录，按 `skills/<name>/SKILL.md` 的通用结构组织；
 - 请按你所使用的 Agent（Claude Code、Codex、其他遵循 Agent Skill 规范的工具等）自己的加载方式接入；
+- 推荐的轻量开发工作流见 [`docs/DEVELOPMENT_WORKFLOW.md`](docs/DEVELOPMENT_WORKFLOW.md)；
 - 本仓库**不提供**具体平台的加载路径或配置命令，原因是这些命令容易随版本变化而失效，且会让维护者承担超出仓库范围的兼容性承诺。
 
 ## 兼容性与验证声明
@@ -23,25 +24,22 @@ git clone https://github.com/luozijian1990/personal-skill.git
 
 下面的分类按用途组织，每个 Skill 一句话简介。详细使用说明请打开本地目录下的 `SKILL.md`。
 
-### 开发工作流与工程方法
+### 轻量开发工作流（来自 mattpocock/skills）
 
 | Skill | 简介 |
 |---|---|
-| [`brainstorming`](skills/brainstorming/) | 在动手前把想法压成可实施设计；提供 Design / Grill / Refinement 三种模式与 SDD 模板 |
-| [`dispatching-parallel-agents`](skills/dispatching-parallel-agents/) | 识别可并行的独立任务，按结构化方式派发给多个 subagent |
-| [`executing-plans`](skills/executing-plans/) | 按 plan 文件逐任务实施，分批校验，并在每个 task 完成时立即更新状态 |
-| [`finishing-a-development-branch`](skills/finishing-a-development-branch/) | 实现完成后引导合入、PR 或清理的结构化收尾流程 |
-| [`receiving-code-review`](skills/receiving-code-review/) | 接到评审反馈时要求验证而非表演性认同，避免盲目改动 |
-| [`requesting-code-review`](skills/requesting-code-review/) | 完成任务前以一致模板请求评审，附带评分机制 |
-| [`stack-selector`](skills/stack-selector/) | vibe coding 流程中，从 React mock 反推后端能力，按「项目形态 × 语言 × 维度」敲定技术栈 |
-| [`subagent-driven-development`](skills/subagent-driven-development/) | 在当前会话里按 plan 的独立任务并行驱动 subagent |
-| [`systematic-debugging`](skills/systematic-debugging/) | 遇到 bug / 测试失败时按系统化流程定位根因，先复现再修 |
-| [`test-driven-development`](skills/test-driven-development/) | 实现任何 feature/bugfix 前先写测试，让代码服从可验证目标 |
-| [`using-git-worktrees`](skills/using-git-worktrees/) | 启动需要隔离的特性工作时，安全地建立 git worktree |
-| [`using-superpowers`](skills/using-superpowers/) | 介绍如何发现并恰当地调用各项 superpowers skill |
-| [`verification-before-completion`](skills/verification-before-completion/) | 宣称“完成”前先跑验证命令，证据先于断言 |
-| [`writing-plans`](skills/writing-plans/) | 把规格 / 需求拆成可逐步执行的多任务实施计划 |
-| [`writing-skills`](skills/writing-skills/) | 新建或编辑 Skill，并按规范在部署前完成自检 |
+| [`setup-matt-pocock-skills`](skills/setup-matt-pocock-skills/) | 首次使用时配置 issue tracker、领域文档和标签约定 |
+| [`grill-with-docs`](skills/grill-with-docs/) | 在已有代码库中逐问澄清需求，并沉淀领域词汇与 ADR |
+| [`grill-me`](skills/grill-me/) | 没有代码库或不需要留档时，进行无状态需求审查 |
+| [`grilling`](skills/grilling/) | 提供逐题追问的基础审查原语 |
+| [`domain-modeling`](skills/domain-modeling/) | 统一领域术语，维护 `CONTEXT.md` 和必要的 ADR |
+| [`codebase-design`](skills/codebase-design/) | 设计深模块、接口和可测试 seam |
+| [`to-spec`](skills/to-spec/) | 把已讨论内容综合成规格并发布到 issue tracker |
+| [`to-tickets`](skills/to-tickets/) | 把规格拆成带阻塞关系的纵向 tracer-bullet tickets |
+| [`tdd`](skills/tdd/) | 对每个 ticket 采用红—绿—重构循环实现 |
+| [`code-review`](skills/code-review/) | 从 Standards 和 Spec 两个轴审查变更 |
+| [`handoff`](skills/handoff/) | 将当前上下文压缩成跨会话 handoff 文档 |
+| [`diagnosing-bugs`](skills/diagnosing-bugs/) | 为难复现 bug 建反馈回路，并用回归测试锁定根因 |
 
 ### 内容、设计与可视化
 
@@ -78,6 +76,12 @@ git clone https://github.com/luozijian1990/personal-skill.git
 |---|---|
 | [`darwin-skill`](skills/darwin-skill/) | 自动化的 Skill 优化器：按 8 维 rubric 评分、用 git 做 hill-climbing、生成结果卡片 |
 
+### 学习
+
+| Skill | 简介 |
+|---|---|
+| [`teach`](skills/teach/) | 在工作区内持续维护 mission、参考资料、课程和学习记录 |
+
 ## 使用说明
 
 - 每个 Skill 目录是自包含的，所有引用使用相对路径，便于按需取用或组合；
@@ -100,7 +104,6 @@ git clone https://github.com/luozijian1990/personal-skill.git
 
 本合集中改编、组合的部分内容来自以下上游项目（具体许可证与本地改动见 `THIRD_PARTY_NOTICES.md`）：
 
-- [obra/superpowers](https://github.com/obra/superpowers) — Jesse Vincent
 - [mattpocock/skills](https://github.com/mattpocock/skills) — Matt Pocock
 - [anthropics/skills](https://github.com/anthropics/skills) — Anthropic
 - [github/awesome-copilot](https://github.com/github/awesome-copilot) — GitHub
