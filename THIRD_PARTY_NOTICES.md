@@ -95,6 +95,7 @@
 - `learning-roadmap`
 - `playwright-e2e-debug-report`
 - `project-init`
+- `ssh-remote-ops`
 - `stack-selector`
 
 第三方依赖（如阿里云 SDK、Playwright、React、MUI、marked、highlight.js、mermaid 等）不在本表的“上游来源”范围内，仍受其各自项目许可证约束，使用者自行遵守。

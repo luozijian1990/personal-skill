@@ -69,6 +69,7 @@ git clone https://github.com/luozijian1990/personal-skill.git
 | [`aliyun-asr`](skills/aliyun-asr/) | 用阿里云“录音文件识别闲时版”批量把音频/视频 URL 转成文字 |
 | [`grafana-dashboards`](skills/grafana-dashboards/) | 生成与管理生产级 Grafana 监控大盘 |
 | [`k8s-troubleshoot`](skills/k8s-troubleshoot/) | Pod/Service/Ingress/公网四层排查 K8s 部署故障 |
+| [`ssh-remote-ops`](skills/ssh-remote-ops/) | 通过 SSH 对远程服务器进行只读优先、授权明确、可回退的运维排查与操作 |
 
 ### Skill 工具链
 

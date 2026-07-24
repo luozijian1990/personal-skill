@@ -1,0 +1,4 @@
+interface:
+  display_name: "SSH Remote Ops"
+  short_description: "通过 SSH 安全诊断远程服务器并执行经授权的受控运维操作"
+  default_prompt: "使用 $ssh-remote-ops 连接目标服务器，先只读检查，再按授权范围处理问题。"
