@@ -61,6 +61,7 @@ git clone https://github.com/luozijian1990/personal-skill.git
 | [`playwright-cli`](skills/playwright-cli/) | 用 `playwright-cli` 在终端驱动真实浏览器：导航、截图、表单、调试 |
 | [`playwright-e2e-debug-report`](skills/playwright-e2e-debug-report/) | Playwright 真实浏览器 E2E 全量测试 + 经批准的自修复 + Markdown 报告 |
 | [`project-init`](skills/project-init/) | 按规范化结构初始化 Python / Golang 后端项目脚手架 |
+| [`stack-selector`](skills/stack-selector/) | 从 React mock 和运行约束反推运维类 Python / Go 项目的后端组件与技术栈 |
 
 ### 运维与平台工具
 
