@@ -1,117 +1,167 @@
-# 选型矩阵：形态 × 语言 × 维度
+# 选型矩阵：组件 × 语言 × 运行约束
 
-这是 stack-selector 的知识库。每个维度给出 Python / Golang 的候选、**推荐默认**，以及何时该换备选。
-用法：先定项目形态和语言，再到对应章节按维度查，不用整篇背。
+这是 stack-selector 的稳定默认技术库。先确认系统组件、语言和运行约束，再读取对应章节。每个维度最多
+保留一个推荐方案和一个备选方案；没有明确收益时使用推荐方案。
 
-> 库的活跃度会变。给一线选型时，归档/停更的库不要当默认推荐（本文件已剔除已知归档项，
-> 例如 Go 的 `gorilla/websocket` 已归档，新项目默认用 `coder/websocket`）。
+当前矩阵只覆盖运维类 Python / Go 项目，不是通用语言选型大全。
 
 ## 目录
 
-- [A. backend 形态](#a-backend-形态)
-  - [A1. 核心维度](#a1-核心维度必填)
-  - [A2. 按需维度](#a2-按需维度看-mock-信号)
-- [B. 采集 / 执行型 agent 形态](#b-采集--执行型-agent-形态)
-- [C. CLI 形态](#c-cli-形态)
-- [D. 工程化横切（贯穿三种形态）](#d-工程化横切贯穿三种形态)
-- [E. 数据库选择速查](#e-数据库选择速查)
+- [A. Backend](#a-backend)
+- [B. Worker / Scheduler](#b-worker--scheduler)
+- [C. Agent](#c-agent)
+- [D. CLI](#d-cli)
+- [E. Kubernetes Controller / Operator](#e-kubernetes-controller--operator)
+- [F. 数据与存储](#f-数据与存储)
+- [G. 通信方式](#g-通信方式)
+- [H. 安全与运行基线](#h-安全与运行基线)
+- [I. 工程化](#i-工程化)
 
 ---
 
-## A. backend 形态
+## A. Backend
 
-### A1. 核心维度（必填）
+默认是模块化单体 Backend。表中的数据访问、认证和授权都需要结合项目确认，不因为看到 CRUD 或登录页
+就自动采用 ORM、JWT 或 RBAC。
 
-| 维度 | Python | Golang | 推荐默认 & 切换条件 |
+| 维度 | Python | Go | 推荐默认与备选条件 |
 |---|---|---|---|
-| **Web 框架** | FastAPI | `net/http`(Go 1.22+ 的 ServeMux 已支持 method+路径路由) / chi / Gin | Python 默认 **FastAPI**（自带校验+OpenAPI）。Go：富路由+中间件栈的完整服务用 **Gin**；只要轻量路由+中间件用 **chi**（与 stdlib 完全兼容）；端点极少时直接 **net/http**。 |
-| **ORM / 数据访问** | SQLAlchemy(+Alembic 迁移) / SQLModel | GORM / sqlx / sqlc | Python 默认 **SQLAlchemy + Alembic**；想和 pydantic 打通用 **SQLModel**。Go：要 ORM 体验用 **GORM**；想写原生 SQL 但要省去扫描样板用 **sqlx**；想由 SQL 反向生成类型安全代码用 **sqlc**（团队 SQL 熟练时最稳）。 |
-| **数据库** | PostgreSQL / MySQL / SQLite | 同左 | 默认 **PostgreSQL**（功能全、JSON 支持好）。单机/嵌入式/工具类用 **SQLite**。已有 MySQL 生态就 MySQL。详见 [E 节](#e-数据库选择速查)。 |
-| **配置管理** | pydantic-settings / dynaconf | viper / koanf | Python 默认 **pydantic-settings**（和 FastAPI 同源，类型校验白送）。Go 默认 **viper**（多来源+热加载）；想更轻、模块化用 **koanf**。 |
-| **日志** | loguru / structlog | slog(标准库) / zap / zerolog | Python 默认 **loguru**（开箱即用）；要结构化+严肃生产用 **structlog**。Go 默认 **slog**（Go 1.21+ 标准库，无需第三方）；追求极致性能用 **zap** 或 **zerolog**。 |
-| **认证** | PyJWT / python-jose（+ OAuth2） | golang-jwt | 默认 **JWT**（Python: PyJWT；Go: golang-jwt）。对接外部身份提供方用 **OAuth2/OIDC**。 |
-| **授权（RBAC）** | casbin (pycasbin) | casbin | 有角色/权限模型时用 **casbin**（两种语言同一套模型，运维平台多角色场景常用）。无角色区分则不需要。 |
-
-### A2. 按需维度（看 mock 信号才填，否则显式排除）
-
-| 维度 | Python | Golang | 推荐默认 & 切换条件 |
-|---|---|---|---|
-| **缓存** | cachetools / aiocache（进程内）；redis-py（Redis） | 内置 `map`+`sync.RWMutex` / ristretto（进程内）；go-redis（Redis） | **先进程内缓存**，多实例需共享/需持久化才上 **Redis**。无热点读信号则不引入。 |
-| **实时通信** | 轮询（无需库）/ sse-starlette（SSE）/ FastAPI 内置 WebSocket | 轮询 / 标准库 SSE / **coder/websocket**（WS） | **默认轮询**；服务端单向推用 **SSE**；双向高频才上 **WS**。Go 的 WS 新项目用 **coder/websocket**（context 原生、并发写安全）；维护老代码才用已归档的 gorilla/websocket。 |
-| **异步任务 / 后台 worker** | Celery / arq / Dramatiq | goroutine+channel / asynq | 简单后台任务：Python 用 **arq**（基于 Redis，轻）或 **Dramatiq**；重型分布式任务用 **Celery**。Go 优先 **goroutine+channel**，需要持久化任务队列用 **asynq**（基于 Redis）。 |
-| **定时调度** | APScheduler | robfig/cron | 巡检/周期检查的命根子。Python **APScheduler**，Go **robfig/cron**。 |
-| **消息队列** | aiokafka(Kafka) / pika(RabbitMQ) / nats-py(NATS) | sarama 或 kafka-go(Kafka) / amqp091-go(RabbitMQ) / nats.go(NATS) | **运维内部工具极少需要**。真有跨服务事件/削峰才上。轻量首选 **NATS**；已有 Kafka 生态用 Kafka。无强证据则显式排除。 |
-| **可观测性** | prometheus-client + opentelemetry-python | client_golang + opentelemetry-go | 做指标暴露/对接 Prometheus 时引入。指标用 **Prometheus client**，链路追踪用 **OpenTelemetry**。 |
-| **时序数据库** | （客户端：对应库） | （客户端：对应库） | 指标趋势类数据用 **VictoriaMetrics**（省资源、兼容 Prometheus 协议）/ **Prometheus** / **InfluxDB**。**别把时序塞关系库。** |
-| **远程执行 / SSH** | paramiko / asyncssh | golang.org/x/crypto/ssh | 远程主机操作时引入。Python 异步场景用 **asyncssh**，否则 **paramiko**；Go 用标准扩展库 **x/crypto/ssh**。 |
-| **gRPC** | grpcio + grpcio-tools | google.golang.org/grpc | 运维平台多服务内部通信时引入。对外 HTTP API 不需要。 |
-| **K8s 客户端** | kubernetes（官方 client） | client-go | 对接 K8s 资源时引入。Go 的 **client-go** 是一等公民，对接深度操作优先 Go。 |
-| **数据校验** | pydantic（FastAPI 白送，无需额外引入） | go-playground/validator | Python 用 FastAPI 时校验已内置。Go 需显式引入 **validator**。 |
-| **HTTP 客户端** | httpx（异步友好）/ requests | net/http / go-resty | 调外部 API 时。Python 异步选 **httpx**。Go 标准库够用，想要链式/重试糖用 **go-resty**。 |
-| **重试 / 退避 / 熔断** | tenacity | cenkalti/backoff + sony/gobreaker | 调用易抖动的外部依赖时引入，提升可靠性。 |
-| **文件存储** | （本地 / boto3 等对象存储 SDK） | （本地 / 对应对象存储 SDK） | 小量文件本地落盘即可；规模化用对象存储（MinIO/S3 兼容）。 |
+| Web 框架 | **FastAPI** | **Gin** | Python 默认 FastAPI；Go 默认 Gin，端点少且团队偏标准库风格时备选 chi |
+| 数据访问 | **SQLAlchemy + Alembic** | **sqlc** | Python 可只用 SQLAlchemy Core/显式 SQL；Go 默认 sqlc，团队更需要 ORM 体验时备选 GORM |
+| 配置 | **pydantic-settings** | **viper** | 默认从环境变量或挂载配置读取；Secret 不写入配置文件和仓库 |
+| 结构化日志 | **structlog** | **slog** | 默认输出 JSON 或稳定键值字段并携带 request/task ID；仅在现有日志栈有要求时替换 |
+| 认证 | **复用现有 SSO / OIDC / 网关身份** | 同左 | 内部系统默认复用已有身份设施；没有可复用设施时备选服务端 Session，不因登录页默认 JWT |
+| 授权 | 应用内角色与数据范围检查 | 同左 | 固定少量角色先写清规则；策略复杂且动态时备选 casbin |
+| 数据校验 | FastAPI / Pydantic 内置 | go-playground/validator | 只在 API 边界校验输入，不重复堆校验框架 |
+| HTTP 客户端 | **httpx** | **net/http** | 外部调用需要统一超时；Go 需要链式调用和统一重试时备选 go-resty |
 
 ---
 
-## B. 采集 / 执行型 agent 形态
+## B. Worker / Scheduler
 
-agent 常驻主机，采集指标或执行指令，**多数时候不碰数据库，也不需要 Web 框架**。
-backend 那张表基本不适用，按下面这套独立维度走。
+任务进度和定时配置只说明存在任务执行能力，不自动意味着独立 Worker 或任务队列。先选择最轻的可靠性层级：
 
-| 维度 | 要敲定什么 | Python | Golang |
+```text
+短任务同步执行 -> 进程内后台任务 -> 独立 Worker + 持久化队列
+```
+
+| 维度 | Python | Go | 推荐默认与升级条件 |
 |---|---|---|---|
-| **系统/进程指标采集** | CPU/内存/磁盘/网络/进程 | psutil | gopsutil |
-| **上报方式** | push 还是 pull——**直接决定要不要 HTTP 服务面** | push: 调 server API / 推 Pushgateway/Kafka；pull: 用框架暴露 `/metrics` | 同左；pull 模式暴露 `/metrics` 用 **net/http** 即可，**别上 Gin** |
-| **断网缓冲** | 网断了数据丢不丢——本地落盘 spool | SQLite / 本地文件 | bbolt / badger（嵌入式 KV）/ SQLite |
-| **指令通道**（执行型） | 怎么收指令 | 轮询 server / 长连接 / 订阅 MQ | 同左 |
-| **执行安全**（执行型） | 超时控制、并发上限、命令白名单——**agent 能在主机跑命令，这块不卡死会出事** | `asyncio` 超时 + 信号量 + 白名单校验 | `context` 超时 + 带缓冲 channel 限并发 + 白名单 |
-| **资源自限** | agent 不能吃满宿主机——CPU/内存上限 | cgroup / 自身限流 | 同左，Go 内存占用天然更低 |
-| **生命周期** | 优雅退出 + 信号处理 + 配置热加载（不重启换配置） | signal 处理 + watchdog 监听配置 | `os/signal` + `context` 取消 + fsnotify 监听配置 |
-| **分发** | 怎么装到大量主机上 | PyInstaller 打包 / 容器化（带运行时，较重） | **单二进制 + systemd**（Go 在这点上完胜，是 agent 选 Go 的主因） |
-
-> **选型提示**：采集/执行 agent 若要分发到大量主机、对资源敏感，**强烈倾向 Go**（单文件、无运行时依赖、内存低）。
-> Python 写 agent 不是不行，但分发和资源占用是硬伤。
+| 进程内后台任务 | **asyncio + 有界并发** | **goroutine + 有界 channel** | 默认把任务状态持久化到关系库；避免无上限创建任务 |
+| 独立 Worker | **Celery** | **asynq** | 仅在需要重启恢复、自动重试、多实例消费或独立扩缩容时使用；会引入 Redis 等队列依赖 |
+| Scheduler | **APScheduler** | **robfig/cron** | 单实例可与 Backend 同进程；多实例必须处理选主、重复触发和补偿 |
+| 任务状态 | 关系库任务表 | 同左 | 记录状态、时间、错误和操作者；队列不是业务状态的唯一来源 |
+| 取消与恢复 | 取消令牌 + 检查点 | `context` + 检查点 | 只有可安全中断的任务才标记为可取消；恢复语义必须在 SDD 中明确 |
 
 ---
 
-## C. CLI 形态
+## C. Agent
 
-> 注意：React mock **反推不出 CLI**（前端 mock 对应的几乎必然是 backend）。
-> CLI 形态通常是用户脱离 mock、明确说「做一个命令行工具」时才走这条线。
+只有需要目标主机本地采集/执行、中心端不可达，或大规模分发确有收益时才增加 Agent。多数 Agent 不需要
+Web 框架和中心数据库。
 
-| 维度 | Python | Golang | 推荐默认 & 切换条件 |
+| 维度 | Python | Go | 推荐默认与备选条件 |
 |---|---|---|---|
-| **CLI 框架** | Typer（基于类型注解，最省事）/ Click | Cobra（事实标准，kubectl/docker 都用它） | Python 默认 **Typer**，Go 默认 **Cobra**。 |
-| **配置** | 同 backend（pydantic-settings / dynaconf） | viper（和 Cobra 同作者，天然搭配） | Go 的 Cobra+viper 是黄金组合。 |
-| **输出格式** | rich（彩色/表格）/ tabulate；JSON 输出用标准库 | text/tabwriter（标准库表格）/ lipgloss | 给人看用表格，给机器用/管道用 **JSON**（务必支持 `--json`/`-o json`）。 |
-| **交互** | rich（进度条/spinner）/ questionary（交互提问） | bubbletea（TUI）/ promptui（交互提问） | 长任务给进度条，危险操作给确认提示。 |
-| **分发** | PyInstaller / pipx | 单二进制 | Go 单二进制分发体验最好。 |
+| 系统指标采集 | **psutil** | **gopsutil** | 只采集需求明确的指标，避免无边界采集 |
+| 上报方式 | 调 Backend API | 调 Backend API | 默认 push；已有 Prometheus pull 体系时备选暴露 `/metrics` |
+| 断网缓冲 | **SQLite** | **bbolt** | 只有允许断网续传时启用，并设置容量和保留上限 |
+| 指令通道 | 轮询 Backend | 轮询 Backend | 默认轮询；低延迟且连接稳定性要求明确时再考虑长连接 |
+| 执行控制 | `asyncio` 超时 + Semaphore | `context` 超时 + 有界 channel | 命令白名单、参数校验、并发上限和审计不可省略 |
+| 生命周期 | signal + 取消上下文 | `os/signal` + `context` | 支持健康状态、优雅退出和有上限的资源使用 |
+| 分发 | 容器或 PyInstaller | **单二进制 + systemd** | 大量主机、资源敏感时默认 Go；团队固定 Python 时才采用 Python 备选 |
 
 ---
 
-## D. 工程化横切（贯穿三种形态）
+## D. CLI
 
-这些不算「选型」，但确认单里最好带一句，省得 SDD 之后再补。
+CLI 可以与 Backend 或 Agent 同时存在，用于自动化、批处理和管理员操作。
 
-| 维度 | Python | Golang |
+| 维度 | Python | Go | 推荐默认与备选条件 |
+|---|---|---|---|
+| CLI 框架 | **Typer** | **Cobra** | 小型 Python CLI 也可直接 argparse；不要为了单个命令引入复杂框架 |
+| 配置 | pydantic-settings | viper | 与 Backend / Agent 复用配置约定，但不要把服务端 Secret 下发到 CLI |
+| 输出 | rich + `--json` | `text/tabwriter` + `--json` | 人读用表格，自动化调用提供稳定 JSON |
+| 危险操作 | 显式确认 | 显式确认 | 非交互自动化通过专门参数确认，并保留操作审计 |
+| 分发 | pipx | 单二进制 | 需要跨大量机器分发时倾向 Go |
+
+---
+
+## E. Kubernetes Controller / Operator
+
+普通 Pod、Deployment、Node 查询和操作只需 Backend / Worker 调用 Kubernetes API。只有持续监听资源事件、
+协调期望状态或管理 CRD 时才引入 Controller / Operator。
+
+| 维度 | 推荐 | 备选与条件 |
 |---|---|---|
-| **测试** | pytest | 标准库 testing + testify |
-| **DB 迁移** | Alembic | golang-migrate |
-| **API 文档** | FastAPI 自带 OpenAPI/Swagger（白送） | swaggo（Gin 等用注解生成 Swagger） |
-| **依赖/构建** | uv / poetry | go mod（标准） |
-| **代码质量** | ruff（lint+format 一把梭） | golangci-lint |
+| 实现方式 | **Go + controller-runtime / client-go** | 团队只能使用 Python 且协调逻辑简单时备选 Kopf |
+| 状态协调 | 幂等 Reconcile + 状态条件 | 不用定时全量扫描替代事件协调，除非目标系统不提供 watch |
+| 权限 | 最小 RBAC + 独立 ServiceAccount | 不复用集群管理员凭证 |
+| 可用性 | 单活或 leader election | 多副本时启用 leader election，并明确重试和退避 |
 
 ---
 
-## E. 数据库选择速查
+## F. 数据与存储
 
-| 场景 | 选 | 理由 |
+| 维度 | 推荐 | 备选与升级条件 |
 |---|---|---|
-| 默认、功能全、要 JSON/复杂查询 | **PostgreSQL** | 运维平台默认首选 |
-| 单机工具、嵌入式、零运维 | **SQLite** | 一个文件，无需独立部署 |
-| 已有 MySQL 生态/团队熟 | **MySQL** | 不折腾，跟团队走 |
-| 指标趋势、时间序列数据 | **时序库**（VictoriaMetrics/Prometheus/InfluxDB） | 关系库存时序早晚查询爆炸 |
-| agent 本地断网缓冲 | **SQLite / bbolt / badger** | 嵌入式，无需独立 DB 进程 |
+| 关系数据 | **复用已有 PostgreSQL / MySQL** | 单机 Docker、小数据量且接受文件级备份时备选 SQLite |
+| 时序数据 | **先评估关系数据库** | 数据量、保留周期或时间范围查询超过关系库能力时备选 VictoriaMetrics |
+| 缓存 | **单实例不设缓存或使用进程内缓存** | 多实例需要共享、明确热点或缓存一致性收益时备选 Redis |
+| 文件 | **小量文件使用持久化本地卷** | 多实例、容量增长或生命周期管理要求明确时备选现有对象存储 |
+| 任务状态 | **关系库任务表** | 不用内存和消息队列代替可审计的业务状态 |
+| 迁移与备份 | 版本化迁移 + 定期备份恢复演练 | SQLite 使用一致性文件备份；服务数据库复用现有备份体系 |
+| 保留策略 | 为任务结果、审计和日志设置期限 | 合规或调查需要更长周期时单独确认归档位置和成本 |
 
-**一句话**：业务关系数据 → PostgreSQL；工具单机 → SQLite；指标时序 → 时序库；agent 本地 → 嵌入式 KV。
-不要用一种库扛所有场景。
+趋势图只是时序数据的信号。小数据量、短保留时间和简单查询可以先用关系数据库，不默认时序数据库。
+
+---
+
+## G. 通信方式
+
+| 场景 | 推荐 | 备选与升级条件 |
+|---|---|---|
+| React 调 Backend | **HTTP JSON API** | 已有明确契约和多语言内部调用需求时备选 gRPC，但不用于浏览器直连 |
+| 任务进度与低频状态 | **轮询** | 需要服务端单向及时推送时备选 SSE |
+| 双向高频通信 | **先确认轮询 / SSE 不足** | 确有双向高频交互时使用 `coder/websocket` |
+| Backend 到 Worker | **进程内调用或任务表** | 需要持久化消费、自动重试和多实例时备选任务队列 |
+| Backend 到 Agent | **Agent 轮询命令并上报结果** | 延迟要求明确且网络稳定时备选长连接 |
+| 跨服务事件 | **直接调用或关系库事务** | 明确存在异步解耦、积压或削峰时备选现有消息系统 |
+
+Go WebSocket 新项目默认推荐 `coder/websocket`，因为 API 更轻、对 `context` 的支持更自然。不要再以
+`gorilla/websocket`「已归档」作为推荐理由；维护旧项目时根据现有依赖和迁移收益决定是否更换。
+
+---
+
+## H. 安全与运行基线
+
+这些维度必须在确认单中说明处理方式，但不要求每项引入第三方组件。
+
+| 维度 | 默认处理 | 何时升级 |
+|---|---|---|
+| 配置与 Secret | 环境变量、只读挂载或现有 Secret 系统；仓库和日志不出现明文 | Kubernetes 使用 Secret 或现有外部 Secret 系统 |
+| 健康检查与退出 | 提供存活/就绪检查；收到信号后停止接单并限时等待任务结束 | 有负载均衡或编排平台时接入 readiness 和摘流流程 |
+| 日志与错误 | 结构化日志，带 request/task ID，错误记录上下文但隐藏 Secret | 已有集中日志平台时接入；不为小工具单独建设平台 |
+| 超时、重试、并发 | 所有外部调用有超时；只对可重试错误退避；设置全局和目标级并发上限 | 出现依赖雪崩风险时再评估熔断 |
+| 幂等与重复提交 | 写操作使用幂等键、唯一约束或状态机保护 | 跨系统操作需要明确去重窗口和补偿 |
+| 数据迁移与备份 | 版本化迁移；写明备份周期、恢复步骤和责任人 | 数据重要性提高时做自动恢复演练 |
+| 操作审计 | 记录谁在何时对什么目标执行什么操作及结果 | 高风险操作增加审批和不可篡改归档 |
+| 长任务取消与恢复 | 状态持久化；仅在安全点响应取消；默认失败后人工重试 | 需要重启恢复或自动重试时拆 Worker / 引入持久化队列 |
+| 远程命令白名单 | 允许的动作模板 + 参数校验，禁止任意 shell 拼接 | 特殊命令走单独审批和更严格权限 |
+| 凭证保存 | 引用 Secret，不回传前端、不写任务日志；使用最小权限和轮换 | 多租户或高风险环境接入专用凭证系统 |
+| 结果与日志保留 | 设置默认期限、容量上限和清理任务 | 合规或调查要求出现时归档到现有存储 |
+
+OpenTelemetry、Redis、MQ 和独立日志平台均为按需组件，不属于默认运行基线。
+
+---
+
+## I. 工程化
+
+| 维度 | Python | Go |
+|---|---|---|
+| 测试 | **pytest** | **testing + testify** |
+| 数据库迁移 | **Alembic** | **golang-migrate** |
+| API 文档 | FastAPI OpenAPI | swaggo |
+| 依赖与构建 | **uv** | **go mod** |
+| 代码质量 | **ruff** | **golangci-lint** |
+
+工程化选择应复用仓库已有工具；表中默认值只用于新项目或仓库没有既定约定时。

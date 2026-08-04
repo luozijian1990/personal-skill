@@ -1,0 +1,41 @@
+{
+  "skill_name": "stack-selector",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我们做了一个简单资产管理 React mock：资产列表、分页、添加、编辑、删除和详情。团队主要用 Python，只有 2-3 个内部用户，数据不到 1 万条，部署为普通服务器上的单实例 Docker，没有现成数据库和 SSO。请产出可交给 SDD 的技术选型确认单。",
+      "expected_output": "推荐模块化单体 Backend 和 SQLite，不引入 Redis、MQ、Worker、时序数据库；包含日志、健康检查、Secret、迁移与备份等运行基线。",
+      "files": [],
+      "assertions": [
+        "选择模块化单体 Backend，不增加 Worker、Agent 或微服务",
+        "数据库选择 SQLite，或说明同等轻量的单机持久化理由",
+        "明确排除 Redis、MQ 和时序数据库",
+        "说明结构化日志、健康检查、Secret 管理和数据库备份"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "我们有一个 Python 巡检任务平台 mock：创建巡检任务、查看进度和错误、配置 cron 定时执行。单实例 Docker 部署，10 个内部用户，每个任务通常 3-8 分钟，失败后先由人工查看错误并重试，不要求重启后自动续跑，也没有 Redis 或 MQ。请产出可交给 SDD 的技术选型确认单。",
+      "expected_output": "Backend + Scheduler，初期进程内后台任务，关系库持久化任务状态，前端轮询；只有要求恢复、多实例或自动重试时才拆 Worker 和引入队列。",
+      "files": [],
+      "assertions": [
+        "组件包含 Backend + Scheduler，Scheduler 可与 Backend 同进程",
+        "初期使用有界的进程内后台任务，不默认独立 Worker 或任务队列",
+        "任务状态和错误持久化到关系数据库",
+        "前端优先轮询，并给出拆 Worker 和引入队列的升级条件"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "我们要做一个 Go 远程主机执行平台：多人选择主机后下发预定义运维命令，并查看 1-2 秒内更新的执行日志。中心服务器能通过 SSH 访问约 200 台主机，任务 1-10 分钟；API 与执行任务需要安全隔离，失败后人工重试，不要求 Agent 本地采集，也没有 Redis/MQ。公司已有 PostgreSQL、SSO 和 Secret 管理系统。请产出可交给 SDD 的技术选型确认单。",
+      "expected_output": "Backend + 独立 Worker，默认不加 Agent；复用 PostgreSQL、SSO、Secret 系统；轮询或 SSE 而非默认 WebSocket；覆盖凭证、白名单、超时、并发、审计和留存。",
+      "files": [],
+      "assertions": [
+        "因安全隔离选择 Backend + 独立 Worker，并说明 Agent 当前不需要",
+        "复用 PostgreSQL、SSO 和现有 Secret 管理，不默认 Redis 或 MQ",
+        "实时日志选择 SSE 或有依据的轮询，不默认 WebSocket",
+        "覆盖凭证管理、命令白名单、超时、并发限制、操作审计和结果留存"
+      ]
+    }
+  ]
+}
