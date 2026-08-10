@@ -1,0 +1,9 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "personal-skill",
+  "displayName": "Personal Skill Collection",
+  "description": "A curated collection of reusable Agent Skills for development, operations, design, testing, and learning workflows.",
+  "author": {
+    "name": "luozijian1990"
+  }
+}

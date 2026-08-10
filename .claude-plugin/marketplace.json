@@ -1,0 +1,14 @@
+{
+  "name": "personal-skill",
+  "owner": {
+    "name": "luozijian1990"
+  },
+  "description": "Reusable Agent Skills maintained in the personal-skill repository.",
+  "plugins": [
+    {
+      "name": "personal-skill",
+      "source": "./",
+      "description": "A curated collection of reusable Agent Skills for development, operations, design, testing, and learning workflows."
+    }
+  ]
+}

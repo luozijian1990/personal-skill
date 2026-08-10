@@ -1,0 +1,47 @@
+{
+  "skill_name": "scenario-question-designer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "读取 question-gap-analyzer-output/candidate-review.md，把我确认的 QGA-004 和 QGA-009 设计成高级 SRE 场景题。先生成 Scenario Brief，不要直接生成完整题目。",
+      "expected_output": "读取已确认候选和来源，形成带事实分类、六要素、高信号数据、推理链、难度和确认项的 Brief，并停在审核门。",
+      "files": [
+        "evals/fixtures/scenario-candidate-sample.md"
+      ],
+      "assertions": [
+        "只处理用户明确指定的候选 ID",
+        "缺少 QGA-009 正文时列为待补充，不虚构来源或场景",
+        "区分来源事实、模拟构造值和待核实信息",
+        "Brief 包含业务约束、处理判断和能力区分点",
+        "用户确认前不生成完整场景题"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Redis 延迟突然升高，CPU 和内存看起来正常。帮我做一道适合中级平台工程师的场景面试题，信息不足的地方可以合理模拟，但先给确认稿。",
+      "expected_output": "补充少量能改变假设和排查顺序的模拟数据，标记来源状态，保留多条合理路径，生成可审核 Brief。",
+      "files": [],
+      "assertions": [
+        "不会只输出泛泛的 Redis 延迟怎么排查",
+        "模拟数据包含单位、基线或窗口并说明判断作用",
+        "不把模拟值表述成真实事故或通用生产阈值",
+        "难度与中级岗位的范围和责任相符"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "SCN-002 的确认稿可以生成。保留连接数增长和不能重启的约束，删除里面的真实客户名、内网 IP 和我的本地路径。",
+      "expected_output": "只生成 SCN-002，保留已确认约束并完成去标识化，输出通用场景题模板和索引。",
+      "files": [
+        "evals/fixtures/confirmed-scenario-brief-sample.md"
+      ],
+      "assertions": [
+        "只生成明确确认的 SCN-002",
+        "删除客户名、内网 IP 和本地绝对路径",
+        "输出不包含 Example Customer、10.0.0.12 或 /Users/example/private/redis-notes.md",
+        "保留事实、教学性构造和待核实边界",
+        "不出现题库 CLI、数据库、分类 UID 或应用专属字段"
+      ]
+    }
+  ]
+}

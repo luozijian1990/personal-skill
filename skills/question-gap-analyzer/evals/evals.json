@@ -1,0 +1,50 @@
+{
+  "skill_name": "question-gap-analyzer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "分析 ./roadmap/kubernetes/ 下的 Markdown，给我整理最多 15 道适合高级 SRE 自测的面试题；材料不足就少出并说明原因。我没有现成题库，先给候选报告，不要直接生成完整题目。",
+      "expected_output": "明确采用策划模式，读取 Roadmap 后按岗位相关性和面试价值给出普通题与场景题候选；不声称题库未覆盖，并停在用户确认门。",
+      "files": [
+        "evals/fixtures/roadmap-sample.md"
+      ],
+      "assertions": [
+        "明确说明没有已有题目集合，因此使用策划模式",
+        "不使用未覆盖、已覆盖等无证据的题库覆盖结论",
+        "材料不足时减少候选并说明原因，不拆分近义题凑满 15 道",
+        "候选包含来源、个性化依据、考察目标、难度和候选结论",
+        "用户确认前不生成 questions 目录下的完整题目"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "用 ./notes/kubernetes-scheduling.md 对比 ./existing-questions/，结合我目标岗位和真实经历摘要，找出值得补的题。先输出审核报告。",
+      "expected_output": "采用缺口模式，扩展调度相关术语并读取相关题目完整正文，区分覆盖程度和检索置信度，同时说明岗位与真实经历关联。",
+      "files": [
+        "evals/fixtures/roadmap-sample.md",
+        "evals/fixtures/existing-questions-sample.md",
+        "evals/fixtures/personal-profile-sample.md"
+      ],
+      "assertions": [
+        "采用缺口模式并记录已有题目范围",
+        "覆盖判断引用实际题目相对路径或稳定标识",
+        "区分检索命中与实质覆盖",
+        "不会把 Roadmap 内容写成用户亲自做过的项目"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "候选报告里 QGA-002、QGA-006 生成普通题，QGA-004 交给场景题设计，其余先不做。难度按报告建议。",
+      "expected_output": "只为 QGA-002 和 QGA-006 生成通用模板题目并更新 question-set；QGA-004 仅保留为场景题交接候选。",
+      "files": [
+        "evals/fixtures/candidate-review-confirmed-sample.md"
+      ],
+      "assertions": [
+        "只生成明确确认的两个普通题文件",
+        "不把 QGA-004 直接生成普通题或场景题",
+        "输出包含来源与个性化边界",
+        "不出现题库 CLI、数据库或产品专属字段"
+      ]
+    }
+  ]
+}

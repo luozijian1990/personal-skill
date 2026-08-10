@@ -95,10 +95,14 @@
 - `learning-roadmap`
 - `playwright-e2e-debug-report`
 - `project-init`
+- `question-gap-analyzer`
+- `scenario-question-designer`
 - `ssh-remote-ops`
 - `stack-selector`
 
 第三方依赖（如阿里云 SDK、Playwright、React、MUI、marked、highlight.js、mermaid 等）不在本表的“上游来源”范围内，仍受其各自项目许可证约束，使用者自行遵守。
+
+其中 `question-gap-analyzer` 与 `scenario-question-designer` 由仓库所有者基于其 `interview-desktop-app` 中的 repo-local 工作流重新设计为通用、自包含 Skill；未迁移 IQB CLI、数据库、许可证、taxonomy 或 Desktop 专属逻辑。
 
 ## 维护说明
 

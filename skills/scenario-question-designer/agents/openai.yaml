@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scenario Question Designer"
+  short_description: "把知识点或故障素材设计成可审核的个性化场景面试题工具"
+  default_prompt: "Use $scenario-question-designer to turn these selected topics into realistic scenario interview questions."

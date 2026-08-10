@@ -4,14 +4,59 @@
 
 ## 快速开始
 
+### 使用 `npx skills` 安装
+
+无需克隆仓库或全局安装 CLI。先查看仓库中可安装的 Skill：
+
+```bash
+npx skills@latest add luozijian1990/personal-skill --list
+```
+
+全局安装全部 Skill 到 Claude Code：
+
+```bash
+npx skills@latest add luozijian1990/personal-skill \
+  --skill '*' \
+  --agent claude-code \
+  --global
+```
+
+也可以只安装指定 Skill：
+
+```bash
+npx skills@latest add luozijian1990/personal-skill \
+  --skill stack-selector \
+  --agent claude-code \
+  --global
+```
+
+如需安装到其他受支持的 Agent，调整 `--agent` 参数；省略 `--global` 时默认安装到当前项目。
+
+### 作为 Claude Code Plugin 安装
+
+在 Claude Code 会话中添加本仓库提供的 Marketplace，然后安装插件：
+
+```text
+/plugin marketplace add luozijian1990/personal-skill
+/plugin install personal-skill@personal-skill
+/reload-plugins
+```
+
+Plugin 模式会一次加载本仓库的全部 Skill，并使用 `personal-skill` 命名空间。例如：
+
+```text
+/personal-skill:stack-selector
+```
+
+### 手动使用
+
 ```bash
 git clone https://github.com/luozijian1990/personal-skill.git
 ```
 
 - 全部 Skill 位于 `skills/` 目录，按 `skills/<name>/SKILL.md` 的通用结构组织；
-- 请按你所使用的 Agent（Claude Code、Codex、其他遵循 Agent Skill 规范的工具等）自己的加载方式接入；
-- 推荐的轻量开发工作流见 [`docs/DEVELOPMENT_WORKFLOW.md`](docs/DEVELOPMENT_WORKFLOW.md)；
-- 本仓库**不提供**具体平台的加载路径或配置命令，原因是这些命令容易随版本变化而失效，且会让维护者承担超出仓库范围的兼容性承诺。
+- 可按所使用的 Agent（Claude Code、Codex、其他遵循 Agent Skill 规范的工具等）自己的加载方式接入；
+- 推荐的轻量开发工作流见 [`docs/DEVELOPMENT_WORKFLOW.md`](docs/DEVELOPMENT_WORKFLOW.md)。
 
 ## 兼容性与验证声明
 
@@ -52,6 +97,13 @@ git clone https://github.com/luozijian1990/personal-skill.git
 | [`frontend-slides`](skills/frontend-slides/) | 从零或从 PPT 生成富动画的 HTML 幻灯片 |
 | [`learning-notes-builder`](skills/learning-notes-builder/) | 把整理好的材料目录合成结构化中文学习笔记 markdown |
 | [`learning-roadmap`](skills/learning-roadmap/) | 把学习笔记 markdown 转成 roadmap.sh 风格的可交互 HTML 路线图 |
+
+### Roadmap 与面试题设计
+
+| Skill | 简介 |
+|---|---|
+| [`question-gap-analyzer`](skills/question-gap-analyzer/) | 分析 Roadmap 或 Markdown 知识材料，结合个人画像、JD 和可选已有题目，筛选普通题与场景题候选 |
+| [`scenario-question-designer`](skills/scenario-question-designer/) | 把 Roadmap 知识点、题目候选或故障素材设计成经人工确认的个性化场景面试题 |
 
 ### 项目开发与浏览器测试
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Question Gap Analyzer"
+  short_description: "从 Roadmap 筛选个性化面试题并分析覆盖缺口"
+  default_prompt: "Use $question-gap-analyzer to turn this Roadmap into a personalized interview-question candidate set."
