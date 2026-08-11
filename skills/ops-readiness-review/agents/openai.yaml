@@ -1,0 +1,4 @@
+interface:
+  display_name: "运维就绪审查"
+  short_description: "审查运维软件的生产运行、操作安全和失败恢复基础"
+  default_prompt: "使用 $ops-readiness-review，在生产验收前审查这个运维工具的运行与操作安全基础。"

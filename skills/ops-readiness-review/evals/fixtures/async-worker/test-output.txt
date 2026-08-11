@@ -1,0 +1,15 @@
+Fixture 修订：eval-fixture-v1
+验证日期：2026-08-11
+命令：PYTHONDONTWRITEBYTECODE=1 pytest -q -p no:cacheprovider
+结果：2 passed in 0.01s
+
+已覆盖：
+- create_inspection 返回任务标识
+- get_job 返回内存中的运行状态
+
+未覆盖：
+- 重复提交
+- 进程重启
+- 取消
+- 超时
+- 并发限制

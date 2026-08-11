@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inspection-worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: inspection-worker
+  template:
+    metadata:
+      labels:
+        app: inspection-worker
+    spec:
+      containers:
+        - name: worker
+          image: example/inspection-worker:fixture
+          resources:
+            limits:
+              memory: 256Mi

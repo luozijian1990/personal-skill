@@ -1,0 +1,74 @@
+{
+  "skill_name": "ops-readiness-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "请对一个 3 人内部使用、单实例 Docker 部署的资产 CRUD 工具做 Ops Readiness Review。它只有登录、资产增删改查和 CSV 导出，不操作远程主机或 Kubernetes。",
+      "expected_output": "按低风险 CRUD 校准检查，关注后端授权、输入校验、审计边界、备份恢复和部署基线；远程执行、Kubernetes、长任务明确为不适用，不强制 MQ、HA 或 OTel。",
+      "files": [],
+      "assertions": [
+        "先建立低风险内部 CRUD 的风险画像",
+        "检查后端授权、数据备份恢复、配置 Secret 和基础可观测性",
+        "仅有文字描述时把未提供的控制标为 NOT_VERIFIED，不断言系统已经缺失实现",
+        "将远程执行、Kubernetes 和异步任务标为 NOT_APPLICABLE 并说明理由",
+        "不强制 Redis、MQ、微服务、HA 或 OpenTelemetry"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Kubernetes 管理平台准备上线，支持跨集群查看资源、Deployment Restart、Scale、Pod Evict 和 Namespace 级权限。请输出 Ops Readiness Review。",
+      "expected_output": "重点检查后端 Cluster/Namespace 授权、凭证隔离、危险操作确认与审计、Watch/API 可靠性、爆炸半径和失败恢复。",
+      "files": [],
+      "assertions": [
+        "检查后端 Cluster 和 Namespace 级授权及最小权限 RBAC",
+        "检查 kubeconfig/token 隔离、轮换和前端泄露风险",
+        "检查 Restart、Scale、Evict 的确认、审计、幂等和爆炸半径",
+        "覆盖 Watch 重连、API 超时、冲突和部分失败恢复"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "我们有一个 SSH 批量执行平台，用户可选 200 台机器并填写任意 shell 命令；当前共享一把私钥，目标主机不做授权校验，也没有命令白名单、并发限制、超时或审计。准备给运维团队生产使用，请审查。",
+      "expected_output": "识别无限制远程执行、共享凭证和缺少并发/超时/审计为阻断风险，总体结论为 FAIL，并给出上线前最小控制与验证建议。",
+      "files": [],
+      "assertions": [
+        "将任意命令、共享私钥和无目标校验识别为高风险",
+        "将缺少并发限制、超时和审计识别为发布阻断项",
+        "总体结论为 FAIL",
+        "不会自动执行真实 SSH 或泄露凭证"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "请根据 fixture 中的巡检 API、Worker、Deployment 和测试输出做上线前 Ops Review。任务运行 10-40 分钟；请区分文档、静态代码、测试和未验证的运行证据。",
+      "expected_output": "从实际文件识别内存状态、重复执行、重启恢复、超时不确定性、取消和并发限制风险，逐条绑定证据等级与 repo-relative 路径，不把引入 MQ 当作唯一答案。",
+      "files": [
+        "evals/fixtures/async-worker/api.py",
+        "evals/fixtures/async-worker/worker.py",
+        "evals/fixtures/async-worker/deployment.yaml",
+        "evals/fixtures/async-worker/tests/test_worker.py",
+        "evals/fixtures/async-worker/test-output.txt"
+      ],
+      "assertions": [
+        "检查任务状态持久化、幂等键和重复执行保护",
+        "检查 Worker 重启恢复、取消、超时和并发限制",
+        "识别 API 超时后远端结果不确定的问题",
+        "每条关键问题引用 worker.py 等仓库相对证据路径并区分 STATIC 与 TESTED",
+        "说明 test-output.txt 未覆盖恢复能力，且没有 RUNTIME_VERIFIED 证据，不能判定 PASS",
+        "不把引入 MQ 作为唯一或默认修复方案"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "这是一个只读 Prometheus Dashboard，展示集群容量和告警趋势，不保存业务数据、不提供写操作、不做远程执行。请做 Ops Readiness Review。",
+      "expected_output": "按只读系统裁剪范围，关注数据源凭证、查询超时/限流、健康检查、错误可见性和敏感标签；破坏性操作、审计写操作和异步任务判为不适用。",
+      "files": [],
+      "assertions": [
+        "明确系统为只读并降低破坏性操作审查深度",
+        "检查 Prometheus 凭证、查询超时/限制和错误可见性",
+        "考虑指标标签或查询结果的敏感信息暴露",
+        "不要求审批、Worker、MQ、Operator 或 HA 作为默认条件"
+      ]
+    }
+  ]
+}
