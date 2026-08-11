@@ -1,0 +1,4 @@
+body { margin: 0; color: #172033; background: #f5f7fa; font: 14px Arial, sans-serif; }
+header { display: flex; gap: 32px; padding: 16px 24px; background: #fff; border-bottom: 1px solid #cad2df; }
+main { max-width: 960px; margin: 28px auto; }
+button, aside { border: 1px solid #8d9aab; border-radius: 0; background: #fff; padding: 8px 12px; }

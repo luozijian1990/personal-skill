@@ -1,0 +1,81 @@
+{
+  "skill_name": "prototype-parity-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "评审记录已批准 fixture 中的事件中心 HTML，它已转换成 React + Mock。请实际启动 React 源码，检查主导航、事件列表、详情 Drawer、指派流程与空状态，并输出原型一致性门禁报告。fixture 内包含可比较的原型、React 源码、构建验证记录和批准范围说明。",
+      "expected_output": "建立页面和状态覆盖矩阵，真实运行两个版本，对视觉与交互分别给出证据；全部关键 Flow 一致时才判定 PASS。",
+      "files": [
+        "evals/fixtures/parity-pass/approval.md",
+        "evals/fixtures/parity-pass/prototype/index.html",
+        "evals/fixtures/parity-pass/react-mock/package.json",
+        "evals/fixtures/parity-pass/react-mock/index.html",
+        "evals/fixtures/parity-pass/react-mock/build-verification.txt",
+        "evals/fixtures/parity-pass/react-mock/src/App.jsx",
+        "evals/fixtures/parity-pass/react-mock/src/styles.css"
+      ],
+      "assertions": [
+        "固定 HTML 与 React 的比较基准、路由、viewport 和关键 Flow",
+        "检查真实渲染的视觉与交互状态，而不是只做源码审查",
+        "报告使用 MATCH、APPROVED_CHANGE、DEVIATION 或 NOT_VERIFIED 记录覆盖",
+        "只有无阻断偏差且关键范围均已验证时才给出 PASS"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "HTML 原型是冷白、尖角、横向导航和高密度列表，React 版本功能都在，但改成了深色侧边栏、默认 MUI 圆角卡片和宽松间距。帮我做 Prototype Parity Review。",
+      "expected_output": "识别组件库洗平和核心视觉语言改变，将其判为阻断或重大偏差，而不是因为功能齐全就通过。",
+      "files": [],
+      "assertions": [
+        "识别导航结构、色彩、圆角和信息密度的系统性改变",
+        "不会以功能存在为理由忽略视觉契约",
+        "将核心视觉语言改变判为 BLOCKER 或 MAJOR",
+        "Gate 结果为 FAIL"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "React 已复刻 Kubernetes 操作原型的页面外观，但 Deployment Restart 按钮不会打开确认 Dialog，也没有进行中、失败和成功反馈。请检查能否进入架构设计。",
+      "expected_output": "发现关键交互和状态缺失，输出 FAIL，并明确在补齐及重验前不能进入 Architecture Draft。",
+      "files": [],
+      "assertions": [
+        "覆盖 Restart 的确认、进行中、失败和成功状态",
+        "不会因静态外观一致而判定通过",
+        "将关键 Flow 缺失判为 BLOCKER 或 MAJOR",
+        "明确 FAIL 时停止进入 Architecture Draft"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "React 转换时新增了 HTML 中没有的批量删除入口，并默认跳过二次确认。团队没有任何批准记录。其他页面基本一致，请输出 Parity 报告。",
+      "expected_output": "把未经批准的新功能和安全确认缺失视为契约偏差，不能归类为合理增强，最终判定 FAIL。",
+      "files": [],
+      "assertions": [
+        "识别新增批量删除属于未经批准的范围变化",
+        "识别二次确认缺失会改变高风险操作行为",
+        "不会把新增功能自动描述为改进",
+        "Gate 结果为 FAIL"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "构建记录显示 React Mock 已成功打包，但实际浏览器打开后页面白屏并出现 React is not defined。请比较批准的事件中心原型和这个运行失败的实现，判断 Gate。",
+      "expected_output": "不把 build 成功当作运行证据；记录白屏和控制台错误，将核心页面与所有关键 Flow 不可用判为 BLOCKER，最终输出 FAIL。",
+      "files": [
+        "evals/fixtures/runtime-failure/approval.md",
+        "evals/fixtures/parity-pass/prototype/index.html",
+        "evals/fixtures/runtime-failure/react-mock/package.json",
+        "evals/fixtures/runtime-failure/react-mock/index.html",
+        "evals/fixtures/runtime-failure/react-mock/build-verification.txt",
+        "evals/fixtures/runtime-failure/react-mock/src/App.jsx",
+        "evals/fixtures/runtime-failure/react-mock/src/styles.css"
+      ],
+      "assertions": [
+        "区分 build 成功与真实浏览器运行证据",
+        "引用白屏或 React is not defined 的运行失败",
+        "将核心页面和关键 Flow 不可用判为 BLOCKER",
+        "Gate 结果为 FAIL，并要求修复后真实重验"
+      ]
+    }
+  ]
+}

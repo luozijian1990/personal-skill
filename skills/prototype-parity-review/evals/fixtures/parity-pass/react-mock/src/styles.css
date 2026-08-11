@@ -1,0 +1,9 @@
+body { margin: 0; color: #172033; background: #f5f7fa; font: 14px Arial, sans-serif; }
+header { display: flex; align-items: center; gap: 32px; padding: 16px 24px; background: #fff; border-bottom: 1px solid #cad2df; }
+header strong { color: #174ea6; } main { max-width: 960px; margin: 28px auto; padding: 0 20px; }
+button { border: 1px solid #8d9aab; border-radius: 0; background: #fff; padding: 8px 12px; }
+button.active, button.primary { color: #fff; background: #174ea6; border-color: #174ea6; }
+.tabs { display: flex; gap: 8px; margin-bottom: 12px; } .incident { display: flex; justify-content: space-between; padding: 14px; background: #fff; border: 1px solid #cad2df; }
+.panel { margin-top: 12px; padding: 24px; background: #fff; border: 1px solid #cad2df; }
+.backdrop { position: fixed; inset: 0; display: grid; place-items: center; background: #17203355; }
+aside { width: 420px; padding: 16px; background: #fff; border: 1px solid #718096; } aside button { margin-right: 8px; }

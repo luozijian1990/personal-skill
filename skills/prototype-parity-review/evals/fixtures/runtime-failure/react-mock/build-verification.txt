@@ -1,0 +1,5 @@
+revision: runtime-failure-v1
+recorded_at: 2026-08-11T19:50:00+08:00
+command: npm run build
+result: PASS
+scope: 仅证明 Vite 打包成功；浏览器运行会因 React 绑定缺失而失败。

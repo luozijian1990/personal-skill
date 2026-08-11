@@ -1,0 +1,4 @@
+interface:
+  display_name: "原型一致性审查"
+  short_description: "审查 HTML Prototype 与 React 实现的视觉和交互一致性"
+  default_prompt: "使用 $prototype-parity-review，对照已批准的 HTML Prototype 审查这个 React + Mock 实现。"

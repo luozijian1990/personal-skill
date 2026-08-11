@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>事件中心原型</title>
+    <style>
+      body { margin: 0; color: #172033; background: #f5f7fa; font: 14px Arial, sans-serif; }
+      header { display: flex; align-items: center; gap: 32px; padding: 16px 24px; background: #fff; border-bottom: 1px solid #cad2df; }
+      header strong { color: #174ea6; } main { max-width: 960px; margin: 28px auto; padding: 0 20px; }
+      button { border: 1px solid #8d9aab; border-radius: 0; background: #fff; padding: 8px 12px; }
+      button.active, button.primary { color: #fff; background: #174ea6; border-color: #174ea6; }
+      .tabs { display: flex; gap: 8px; margin-bottom: 12px; } .incident { display: flex; justify-content: space-between; padding: 14px; background: #fff; border: 1px solid #cad2df; }
+      dialog { width: 420px; border: 1px solid #718096; border-radius: 0; } dialog::backdrop { background: #17203355; } dialog button { margin-right: 8px; } #empty, #message { margin-top: 12px; padding: 24px; background: #fff; border: 1px solid #cad2df; }
+    </style>
+  </head>
+  <body>
+    <header><strong>运维控制台</strong><nav>事件 &nbsp; 服务 &nbsp; 审计</nav></header>
+    <main>
+      <h1>事件中心</h1>
+      <div class="tabs"><button id="openTab" class="active">处理中</button><button id="resolvedTab">已解决</button></div>
+      <section id="list"><article class="incident"><span>INC-1042 · API 延迟</span><button id="details">查看详情</button></article></section>
+      <section id="empty" hidden>暂无已解决事件</section><section id="message" hidden>事件已指派</section>
+    </main>
+    <dialog id="drawer"><h2>INC-1042</h2><p>API 延迟高于基线。</p><button id="assign" class="primary">指派给我</button><button id="close">关闭</button></dialog>
+    <script>
+      const drawer = document.querySelector('#drawer');
+      const openTab = document.querySelector('#openTab');
+      const resolvedTab = document.querySelector('#resolvedTab');
+      document.querySelector('#details').onclick = () => drawer.showModal();
+      document.querySelector('#close').onclick = () => drawer.close();
+      document.querySelector('#assign').onclick = () => { drawer.close(); document.querySelector('#message').hidden = false; };
+      resolvedTab.onclick = () => { openTab.classList.remove('active'); resolvedTab.classList.add('active'); document.querySelector('#list').hidden = true; document.querySelector('#empty').hidden = false; };
+      openTab.onclick = () => { resolvedTab.classList.remove('active'); openTab.classList.add('active'); document.querySelector('#list').hidden = false; document.querySelector('#empty').hidden = true; };
+    </script>
+  </body>
+</html>
