@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>资产管理功能草图</title>
+  <style>body{font-family:sans-serif;margin:24px}.filters{display:flex;gap:8px;margin-bottom:12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #bbb;padding:8px}.state{padding:20px}.pager{display:flex;gap:12px;margin-top:12px}</style>
+</head>
+<body>
+  <h1>资产管理</h1>
+  <div class="filters">
+    <label>关键字 <input id="keyword"></label>
+    <label>状态 <select id="status"><option value="">全部</option><option>在线</option><option>离线</option></select></label>
+    <button id="search">查询</button><button id="reset">重置</button>
+  </div>
+  <div id="loading" class="state" hidden>加载中…</div>
+  <div id="error" class="state" hidden>加载失败，请重试</div>
+  <div id="empty" class="state" hidden>暂无资产</div>
+  <table id="list"><thead><tr><th>编号</th><th>名称</th><th>类型</th><th>状态</th></tr></thead><tbody><tr><td>A-001</td><td>网关节点</td><td>服务器</td><td id="asset-status">在线</td></tr></tbody></table>
+  <div class="pager"><button id="prev" disabled>上一页</button><span id="page">第 1 / 3 页</span><button id="next">下一页</button></div>
+  <script>
+    const keyword = document.querySelector('#keyword');
+    const status = document.querySelector('#status');
+    const loading = document.querySelector('#loading');
+    const error = document.querySelector('#error');
+    const empty = document.querySelector('#empty');
+    const list = document.querySelector('#list');
+    const prev = document.querySelector('#prev');
+    const next = document.querySelector('#next');
+    const pageLabel = document.querySelector('#page');
+    const assetStatus = document.querySelector('#asset-status');
+    let page = 1;
+    function show(result) {
+      loading.hidden = true;
+      error.hidden = result !== 'error';
+      empty.hidden = result !== 'empty';
+      list.hidden = result !== 'list';
+    }
+    function renderPage() {
+      pageLabel.textContent = `第 ${page} / 3 页`;
+      prev.disabled = page === 1;
+      next.disabled = page === 3;
+    }
+    document.querySelector('#reset').onclick = () => { keyword.value = ''; status.value = ''; assetStatus.textContent = '在线'; show('list'); };
+    document.querySelector('#search').onclick = () => {
+      loading.hidden = false; error.hidden = true; empty.hidden = true; list.hidden = true;
+      if (keyword.value === '加载中') return;
+      assetStatus.textContent = status.value || '在线';
+      setTimeout(() => show(keyword.value === '错误' ? 'error' : keyword.value === '无结果' ? 'empty' : 'list'), 150);
+    };
+    prev.onclick = () => { page = Math.max(1, page - 1); renderPage(); };
+    next.onclick = () => { page = Math.min(3, page + 1); renderPage(); };
+  </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>任务控制台</title>
+  <style>
+    :root { color: #17202a; background: #f4f7f9; font-family: Arial, sans-serif; }
+    body { margin: 0; }
+    nav { display: flex; gap: 24px; padding: 12px 20px; background: #fff; border-bottom: 1px solid #cbd5df; }
+    main { padding: 16px 20px; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th, td { padding: 7px 9px; border: 1px solid #d8e0e7; text-align: left; }
+    button, dialog { border-radius: 0; }
+  </style>
+</head>
+<body>
+  <nav><strong>任务控制台</strong><a href="#tasks">任务</a></nav>
+  <main id="tasks">
+    <button id="open">新建任务</button>
+    <table><thead><tr><th>名称</th><th>状态</th></tr></thead><tbody><tr><td>巡检</td><td>运行中</td></tr></tbody></table>
+  </main>
+  <dialog id="task-dialog"><form method="dialog"><label>目标 <input name="target"></label><button>提交</button></form></dialog>
+  <script>document.querySelector('#open').onclick = () => document.querySelector('#task-dialog').showModal();</script>
+</body>
+</html>

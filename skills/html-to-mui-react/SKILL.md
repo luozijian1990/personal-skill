@@ -1,227 +1,166 @@
 ---
 name: html-to-mui-react
-description: 将 HTML 原型图 1:1 复刻为基于 Vite + React + MUI v5 的前端项目，使用 TypeScript、React Router v6、mock 数据、styled() API，并预先配好 dev/mock/prod 三套环境。当用户提供 HTML 原型目录（或 HTML 文件）并希望转成可运行的 React 项目、或提到"复刻原型""把 HTML 转成 React""用 MUI 重写这个原型""把这些原型生成前端工程"等意图时，使用此 skill。即使用户没有明说"用 MUI"或"用 Vite"，只要上下文是把静态 HTML 原型搭成正式 React 前端项目，都应触发。
+description: 将一个或多个 HTML Prototype 工程化为 Vite + React + MUI v5 前端项目，使用 TypeScript、React Router v6、Mock 数据和 dev/mock/prod 三套环境。默认使用 fidelity 保真模式，保留已批准原型的布局、颜色、字体、间距、密度、动画、响应式行为和交互；仅在用户明确表示原型只代表功能、视觉无需保留或要求统一 MUI 风格时使用 mui-normalize 模式。当用户提出“HTML 转 React”“复刻原型”“把静态页面做成 React + Mock”“用 MUI 重写原型”等请求时使用。
 ---
 
-# HTML → MUI React 项目复刻器
+# HTML → React + MUI 工程化
 
-把一份 HTML 静态原型（通常是多个 HTML 文件，每个代表一个页面）转换成一个结构规范、可运行的 Vite + React + MUI v5 前端项目，并内置 mock 数据和多环境配置。
+把 HTML Prototype 转成可运行的 React + Mock 产品契约。MUI 是实现手段，不是默认视觉答案；已经批准的原型优先于组件库默认样式。
 
-## 用法
+## 两种模式
 
-用户会告诉你 HTML 原型所在的目录（例如 `/mnt/user-data/uploads/prototype/`），以及要生成的项目名。你需要：
+| 模式 | 何时使用 | 视觉契约 |
+|---|---|---|
+| `fidelity`（默认） | 原型已经批准，或用户没有明确放弃原型视觉 | 最大程度保留原型；组件和样式方案必须服从原型 |
+| `mui-normalize` | 用户明确说原型只代表功能，或要求统一成企业 MUI 风格 | 保留功能和流程，视觉统一为本 Skill 的 MUI 基线 |
 
-1. 读取并理解所有 HTML 原型文件
-2. 按照下文的"项目骨架"生成一个完整的 `frontend/` 目录
-3. 按照下文的"HTML → React 映射规则"把每个 HTML 页面转成对应的 Page 组件
-4. 为每个页面生成合理的中文 mock 数据
-5. 最终产物可以直接 `npm install && npm run dev:mock` 跑起来
+不要因为项目使用 MUI，就把 `fidelity` 原型自动改造成默认 MUI Dashboard。
+
+## 输入
+
+- HTML 文件或原型目录；
+- 输出目录，默认 `frontend/`；
+- 已批准的页面、关键 Flow 和目标 viewport；
+- 项目已有的 React、样式和组件约束（如存在）；
+- 用户明确选择的模式（如已提供）。
+
+缺少 HTML 输入时停止，不编造页面。原型尚未批准时可以工程化，但必须把输出标为“待原型评审”，不能声称它是批准后的产品契约。
 
 ## 工作流
 
-### 第 1 步：侦察 HTML 原型
+### 1. 侦察原型
 
-执行下面的动作，不要跳过：
+读取全部 HTML、关联脚本、样式和本地资源。能运行时在真实浏览器中查看，不只读源码。形成：
 
-- `ls` 列出原型目录的所有文件
-- 对每个 HTML 文件都 `view` 一遍，记录：
-  - 页面名称和对应的 URL 路径（从文件名推断，比如 `login.html` → `/login`）
-  - 页面里出现的数据（表格字段、表单字段、卡片内容等）——这些要变成 mock 数据
-  - 页面里的交互元素（Modal / Dialog、Tabs、Toast、Drawer、Snackbar 等）——这些要替换成 MUI 组件
-  - 页面是否有侧边栏 / 顶栏等公共布局——这些要抽成 Layout
-- 如果原型之间有导航关系（比如侧边栏的菜单项跳转到其他页面），把完整的路由表整理出来
+1. 页面清单与路由映射；
+2. 公共布局、Navigation 和信息层级；
+3. 数据字段、状态与 Mock API Shape；
+4. Dialog、Drawer、Tab、筛选、分页、表单和任务流程；
+5. Loading、Error、Empty、Success、Progress 等非默认状态；
+6. 字体、颜色、间距、边框、圆角、阴影、密度、动画和响应式行为；
+7. 外部字体、图片、图标和第三方资源依赖。
 
-完成侦察后，在输出里简短列一下你识别到的"页面清单 + 路由表 + 公共布局"，让用户确认无误再生成代码。
+如果交互只藏在脚本中，必须跟踪事件和状态变化；不要只根据静态首屏推断功能。
 
-### 第 2 步：生成项目骨架
+### 2. 固定模式与转换契约
 
-在用户指定的目录下（默认 `frontend/`）创建以下结构。**不要省略任何一个文件**，即便内容很短：
+按以下规则推荐模式：
 
-```
-frontend/
-├── package.json
-├── vite.config.ts
-├── tsconfig.json
-├── tsconfig.node.json
-├── index.html
-├── .env.development         # dev 环境：指向 dev 后端
-├── .env.mock                # mock 环境：不调用真实接口
-├── .env.production          # prod 环境：指向生产后端
-├── public/
-└── src/
-    ├── main.tsx
-    ├── App.tsx              # 路由集中在这里
-    ├── vite-env.d.ts
-    ├── theme/
-    │   └── index.ts         # MUI 主题定制
-    ├── layouts/
-    │   └── MainLayout.tsx   # 侧边栏 + 顶栏（按原型里的公共布局来）
-    ├── routes/
-    │   └── index.tsx        # 路由配置（可选，也可以全部放 App.tsx）
-    ├── pages/               # 每个 HTML 页面一个子目录
-    │   └── XxxPage/
-    │       ├── index.tsx
-    │       └── styles.ts    # styled() 定义
-    ├── components/          # 可复用的小组件（按需）
-    ├── mock/                # 集中的 mock 数据，按页面/模块分文件
-    │   ├── users.ts
-    │   └── ...
-    ├── api/                 # 接口封装层，根据 VITE_USE_MOCK 切换
-    │   ├── request.ts       # axios 或 fetch 封装
-    │   ├── users.ts
-    │   └── ...
-    └── utils/
-```
+- 已批准原型、强调“1:1”“复刻”“保持设计”或未说明视觉可改变 → `fidelity`；
+- 明确说“视觉不重要”“只保留功能”“统一 MUI” → `mui-normalize`；
+- 语义冲突，例如同时要求“完全 1:1”和“全部改成标准 MUI” → 列出冲突并请求用户选择。
 
-### 第 3 步：HTML → React 映射规则
+输出一份简短契约：模式、页面/路由、公共布局、关键 Flow、目标 viewport、允许变化和未确认项。
 
-- **一个 HTML 页面 → 一个 Page 组件**（放在 `src/pages/PageName/index.tsx`），路径和文件名对齐
-- **HTML 里的 `<dialog>`、自定义 modal 弹窗 → `<Dialog>` / `<DialogTitle>` / `<DialogContent>` / `<DialogActions>`**
-- **HTML 里的 tab 切换（通常用类名 active 实现）→ `<Tabs>` + `<Tab>`，用 `value` + `onChange` 控制**
-- **HTML 里的 toast / alert / 通知 → `<Snackbar>` + `<Alert>`**
-- **HTML 里的抽屉、侧边弹出 → `<Drawer>`**
-- **HTML 里的表格 → `<Table>` + `<TableHead>` / `<TableBody>` / `<TableRow>` / `<TableCell>`，分页用 `<TablePagination>`**
-- **HTML 里的表单 → `<TextField>` / `<Select>` / `<MenuItem>` / `<FormControl>` / `<Checkbox>` / `<Radio>`**
-- **HTML 里的内联样式 / class 样式 → 一律用 `styled()` API 封装成组件**，不要用 `sx` prop，不要写 CSS 文件
-- **HTML 里的图标 → `@mui/icons-material`**（比如 `<EditIcon />`、`<DeleteIcon />`）
-- **HTML 里的图表（如果有）→ `recharts`**（柱图 `<BarChart>`、折线图 `<LineChart>`、饼图 `<PieChart>`）
+**🔴 CHECKPOINT · 🛑 STOP：让用户确认转换契约后再生成工程。** 用户已经在当前请求中明确确认模式、页面和关键 Flow 时，不重复询问。
 
-### 第 4 步：设计约束（MUI 风格）
+### 3. 建立项目骨架
 
-这些是硬约束，不能违背：
+默认使用 Vite、React、TypeScript、React Router v6、MUI v5、Mock API 和 dev/mock/prod 三套环境。读取 [`references/scaffold-templates.md`](references/scaffold-templates.md)：
 
-- **干净的白色背景**，不要渐变，不要花哨装饰
-- **遵循 MUI 原生风格**，不要过度定制 theme，不要改默认圆角和阴影到完全不像 MUI
-- **只用 MUI 组件库**，不引入 Antd、Semi、Arco 等其他 UI 库
-- **图表只用 recharts**，不用 echarts、chart.js
-- **不写注释、不写 console.log、不写 TODO**
-- **所有文案使用中文**，包括 mock 数据、按钮文字、占位符、提示信息
-- **字体一律走 `@fontsource/*` npm 包**，绝对不要在 `index.html` 里写 `<link href="https://fonts.googleapis.com/...">` 或 `<link href="https://fonts.gstatic.com/...">`。Google Fonts CDN 在国内访问极慢甚至超时，会让首屏阻塞数秒。如果原型 HTML 里有这种 `<link>`，**必须删掉**，改成在 `main.tsx` 里 `import '@fontsource/字体名/字重.css'`。任何外部字体 CDN（包括第三方镜像）都不允许引入。
+- 两种模式都可复用 package、Vite、TypeScript、Router、环境和 API 层骨架；
+- `mui-normalize` 可直接采用其中的 MUI Theme 与 Layout 基线；
+- `fidelity` 只复用工程结构，Theme、Layout 和业务页面必须由原型反推，不能套默认白色 Dashboard。
 
-### 第 5 步：Mock 数据和 API 层
+一个 HTML 页面对应一个 Page 组件。公共结构只有在多个页面确实共享时才提取为 Layout 或组件，不能为了“看起来工程化”过度抽象。
 
-`api/request.ts` 里根据 `import.meta.env.VITE_USE_MOCK` 判断走 mock 还是真实接口：
+### 4. 实现 fidelity 模式
 
-```ts
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
+按可观察结果复刻，不要求 DOM 或组件树相同：
 
-export async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  if (USE_MOCK) {
-    const mockHandler = await import(`../mock/router`);
-    return mockHandler.handle<T>(path, options);
-  }
-  const baseURL = import.meta.env.VITE_API_BASE_URL;
-  const res = await fetch(`${baseURL}${path}`, options);
-  return res.json();
-}
-```
+- 保留 Layout、颜色、字体、间距、边框、阴影、密度、层级、Navigation、动画和响应式行为；
+- 保留原型文案与语言，不擅自翻译或重写；
+- MUI 组件会改变外观时，通过 Theme、`styled()`、CSS Modules 或项目已有方案恢复原型；
+- 原型的自定义控件无法由标准 MUI 组件等价表达时，使用语义化 React 组件和必要样式，不强行套 MUI；
+- 图表优先保持原型的图形类型、配色、比例、Label 和交互；只有实现库未指定时才选择 `recharts`；
+- Dialog、Drawer、Tab、表单、Toast 和任务状态必须保留打开、取消、提交、失败和完成行为；
+- 字体改成本地依赖或系统字体，不复制 Google Fonts 等外部字体 CDN。
 
-Mock 数据的设计原则：
+原型存在明显可访问性或安全问题时，不要静默“修好”并造成契约漂移。记录问题，给出最小修正建议，等待用户确认后再改变可观察行为。
 
-- **分模块组织**：每个页面/业务模块单独一个 `mock/xxx.ts` 文件
-- **模拟真实数据**：不要用 `"测试数据 1"` `"测试数据 2"`，要写接近真实业务的中文（人名、公司名、部门、状态等）
-- **数据量合理**：列表类数据准备 10-30 条，足够让分页、筛选能看出效果
-- **保持字段一致性**：mock 的字段名要和真实接口对齐，后续接后端时不用改业务代码
+### 5. 实现 mui-normalize 模式
 
-### 第 6 步：环境配置
+保留原有标准化能力：
 
-`.env.development`:
-```
-VITE_USE_MOCK=false
-VITE_API_BASE_URL=http://dev-api.example.com
-```
+- 使用干净白底、MUI 原生层级和克制 Theme；
+- Dialog、Tabs、Snackbar、Drawer、Table、Form 等优先映射到对应 MUI 组件；
+- 业务样式使用 `styled()`，不使用 `@mui/styles`；
+- 图表使用 `recharts`；
+- 默认使用中文界面与贴近真实业务的中文 Mock 数据，除非用户指定其他语言；
+- 不引入 Ant Design、Semi、Arco 等第二套组件库；
+- 不写 `console.log`、遗留 TODO 或无效注释；
+- 字体使用 `@fontsource/*`，不使用字体 CDN。
 
-`.env.mock`:
-```
-VITE_USE_MOCK=true
-VITE_API_BASE_URL=
-```
+该模式可以改变视觉，但不能丢失页面、数据字段、交互、权限表现或状态反馈。
 
-`.env.production`:
-```
-VITE_USE_MOCK=false
-VITE_API_BASE_URL=https://api.example.com
-```
+### 6. Mock、API 与环境
 
-`package.json` 里的 scripts：
+- 每个业务模块使用独立 Mock 文件；列表准备足够验证筛选和分页的数据，避免“测试数据 1”式占位；
+- API 层通过 `VITE_USE_MOCK` 切换 Mock 与真实请求，业务组件不直接判断环境；
+- `.env.development` 指向开发后端，`.env.mock` 只走 Mock，`.env.production` 指向生产后端占位；
+- Mock 字段、状态机和错误形状与页面契约一致，后续接后端时不需要重写 UI 业务逻辑；
+- 不把 Mock 成功路径描述成真实鉴权、后端可靠性或生产能力。
 
-```json
-{
-  "scripts": {
-    "dev": "vite --mode development",
-    "dev:mock": "vite --mode mock",
-    "build": "tsc -b && vite build --mode development",
-    "build:mock": "tsc -b && vite build --mode mock",
-    "build:prod": "tsc -b && vite build --mode production",
-    "preview": "vite preview"
-  }
-}
-```
+### 7. 验证
 
-注意 `build` 默认走 development 配置（按用户原话"build 默认走的 dev 配置"），`build:prod` 走生产。
+生成完成后执行当前环境允许的最新验证：
 
-### 第 7 步：依赖版本
+1. 检查页面和路由数量与原型映射一致；
+2. 运行 TypeScript/build；依赖未安装时不擅自联网安装，记录待用户执行的命令；
+3. 能启动时使用真实浏览器检查目标 viewport、关键 Flow、控制台错误和页面溢出；
+4. `fidelity` 模式逐项核对视觉语言与交互状态；
+5. 标明 `VERIFIED`、`NOT_VERIFIED` 和失败证据，不用“应该可以”代替结果。
 
-用这些版本（都是经过验证的稳定组合）：
+为关键页面和 Flow 记录可追溯证据，至少包含：
 
-```json
-{
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.0",
-    "@mui/material": "^5.16.0",
-    "@mui/icons-material": "^5.16.0",
-    "@emotion/react": "^11.13.0",
-    "@emotion/styled": "^11.13.0",
-    "recharts": "^2.12.0"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.0",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.0",
-    "typescript": "^5.5.0",
-    "vite": "^5.4.0"
-  }
-}
-```
+| 模式 | 原型基准 | 契约项 | 等价数据/状态 | viewport | 预期 | 实际观察 | 证据 | 结论 |
+|---|---|---|---|---|---|---|---|---|
+| `fidelity` / `mui-normalize` | 文件、URL 或修订 | 视觉项、字段或 Flow | Mock fixture / 前置状态 | 例如 1440×900 | 原型可观察结果 | React 可观察结果 | 截图、操作记录、DOM、控制台或命令结果 | `VERIFIED` / `NOT_VERIFIED` / 已批准偏差 |
 
-**字体依赖（按需追加，不要走 CDN）**：如果原型 HTML 里用到了非系统字体，把对应的 `@fontsource/<字体名>` 加到 `dependencies` 里，并在 `src/main.tsx` 顶部 `import` 用到的字重 CSS。常见映射：
+`fidelity` 需要在等价数据和 viewport 下留下视觉及关键 Flow 证据，不能只用 DOM 或 build 证明视觉保真；`mui-normalize` 不比较原视觉，但要为每个字段、筛选条件、分页动作、权限表现和 Loading/Error/Empty/Success 等状态逐项举证。
 
-| 原型里的字体 | npm 包 | main.tsx 导入示例 |
-| --- | --- | --- |
-| DM Sans | `@fontsource/dm-sans` | `import '@fontsource/dm-sans/400.css'` |
-| DM Mono | `@fontsource/dm-mono` | `import '@fontsource/dm-mono/400.css'` |
-| Inter | `@fontsource/inter` | `import '@fontsource/inter/400.css'` |
-| Roboto | `@fontsource/roboto` | `import '@fontsource/roboto/400.css'` |
-| 思源黑体 | `@fontsource/noto-sans-sc` | `import '@fontsource/noto-sans-sc/400.css'` |
+如果构建或浏览器验证失败，先判断是环境、依赖、实现还是原型资源问题；只修复证据明确且在授权范围内的问题。仍失败时交付部分结果和复现命令，不宣告完成。
 
-**只 import 实际用到的字重**（一般 300/400/500/600 够用），多余字重会增加 bundle 体积。`theme.ts` 的 `typography.fontFamily` 写法保持不变：`"'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif"`，fontsource 注册的字体名和 Google Fonts 完全一致。
+### 8. 交付
 
-### 第 8 步：生成后的自检
+最终报告包含：
 
-生成完所有文件后，在结尾简短报告：
+- 使用的模式与原型基准；
+- 页面、路由、公共布局和 Mock 模块；
+- 已保留的关键视觉/交互契约；
+- 构建和浏览器验证结果；
+- 关键 viewport、Flow 与偏差证据表；
+- 未验证项、已知偏差和用户批准的变化；
+- 本地启动命令；
+- 下一步：`fidelity` 模式交给 `prototype-parity-review` 做独立 Gate，确认通过后再进入架构设计。
 
-- 生成了几个页面 Page 组件
-- 路由表长什么样（路径 → 组件）
-- mock 数据分几个模块
-- 下一步执行命令：`cd frontend && npm install && npm run dev:mock`
+如果环境中没有 `prototype-parity-review`，按本节证据表完成同范围检查并标记 `NOT_INDEPENDENT`，交给用户人工确认；不得把该回退描述成独立 Gate 已通过。
 
-不要跑 `npm install`（用户要下载到本地跑），不要自己验证运行结果——只要代码结构和语法正确即可。
+## 失败处理
 
-## 参考模板
+| 触发条件 | 处理 | 仍无法解决 |
+|---|---|---|
+| HTML、脚本或本地资源缺失 | 列出缺失文件并停止对应页面转换 | 将页面标为 `NOT_VERIFIED`，不编造替代设计 |
+| 模式要求互相冲突 | 展示 `fidelity` 与 `mui-normalize` 的影响并请求选择 | 停在转换契约检查点，不生成代码 |
+| 外部字体/CDN 不可用 | 改用对应 `@fontsource` 或原型定义的系统字体栈 | 记录字体偏差及其影响 |
+| 原型交互无法复现 | 回查事件脚本、状态和前置数据 | 标记缺失 Flow，不把静态页面当完成 |
+| 依赖不可安装或 build 失败 | 保留命令与首个有效错误，判断环境还是代码问题 | 输出部分交付，状态为 `NOT_VERIFIED` |
+| React 与原型出现明显偏差 | 修复最小实现并重跑受影响页面/Flow | 交给 `prototype-parity-review` 判定 `FAIL`，停止进入架构阶段 |
 
-完整的脚手架模板代码（`main.tsx`、`App.tsx`、`theme/index.ts`、`api/request.ts`、`MainLayout.tsx` 的范例）保存在 `references/scaffold-templates.md` 里。当你需要生成这些"框架文件"时，读这个参考文件，复用里面的模板，只改动页面相关的部分。
+## 反例黑名单
 
-业务页面（Page 组件）不要套模板，要根据 HTML 原型的实际内容来写。
+- 不把所有原型统一改成默认 MUI Dashboard。
+- 不因为用了 MUI 就覆盖原型字体、密度、圆角、阴影和 Navigation。
+- 不只复刻静态首屏而遗漏 Dialog、Error、Empty、Loading 和任务状态。
+- 不擅自增加、删除或重排未经批准的功能和高风险操作。
+- 不复制 Google Fonts、Adobe Fonts 或第三方字体镜像 CDN。
+- 不把源码存在、构建未跑或浏览器未测描述为验证通过。
+- 不在 `mui-normalize` 模式里丢失功能，也不在 `fidelity` 模式里用“企业化”作为改版理由。
 
-## 常见坑提醒
+## 固定工程约定
 
-- **路由用 `HashRouter`**：默认使用 `HashRouter`（URL 带 `#`），不用 `BrowserRouter`。原因是常见部署场景（静态托管、对象存储、没法配 `index.html` fallback 的环境）下 history 模式刷新会 404，hash 模式无需后端配合
-- **React Router v6 的 API 变了**：用 `<Routes>` + `<Route element={<Page />} />`，不是 v5 的 `<Switch>` + `<Route component={} />`
-- **MUI v5 的 styled 导入**：从 `@mui/material/styles` 导入，不是 `@mui/styles`
-- **Vite 的环境变量**：必须以 `VITE_` 开头才会暴露给客户端，通过 `import.meta.env.VITE_XXX` 访问，不是 `process.env`
-- **TypeScript 的 env 类型**：要在 `src/vite-env.d.ts` 里声明 `ImportMetaEnv`，否则 `import.meta.env.VITE_USE_MOCK` 会报类型错误
-- **不要用 HTML `<form>`**：用标准事件处理（`onClick`、`onChange`），避免刷新页面的默认行为
-- **不要引入 `@mui/styles`**：那是 v4 残留，v5 里用 `@mui/material/styles` 下的 `styled()`
-- **绝不引用 Google Fonts CDN**：原型 HTML 里如果出现 `<link rel="preconnect" href="https://fonts.googleapis.com">` 或 `<link href="https://fonts.googleapis.com/css2?...">` / `https://fonts.gstatic.com/...`，**必须删除**，不要原样搬到生成的 `index.html`。在国内访问 Google Fonts CDN 经常超时或秒级延迟，会让首屏白屏几秒。正确做法：在 `package.json` 里加 `@fontsource/<字体名>` 依赖，在 `src/main.tsx` 顶部 `import '@fontsource/<字体名>/<字重>.css'`，字体随 bundle 本地分发。任何字体 CDN（Google、Adobe、第三方镜像）都不引入。
+- 默认使用 `HashRouter`，避免静态托管刷新 404；用户已有部署契约时服从项目约定。
+- MUI v5 的 `styled` 从 `@mui/material/styles` 导入。
+- Vite 客户端环境变量使用 `VITE_` 前缀，并在 `vite-env.d.ts` 声明类型。
+- 不使用 `@mui/styles`。
+- 依赖版本和框架文件以 [`references/scaffold-templates.md`](references/scaffold-templates.md) 为基线；已有项目优先服从其锁定版本和代码规范。

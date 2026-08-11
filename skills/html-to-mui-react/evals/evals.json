@@ -1,0 +1,61 @@
+{
+  "skill_name": "html-to-mui-react",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "这个 HTML 运维控制台已经让团队确认过了，横向导航、冷白配色、直角边框、高密度表格和新建任务对话框都要保持。请转换成 React + Mock，MUI 只作为实现组件使用。",
+      "expected_output": "选择 fidelity 模式，先确认页面/路由/Flow 契约，再保留原型视觉语言和交互；不会套默认 MUI Dashboard，完成后要求真实浏览器验证并交给 prototype-parity-review。",
+      "files": [
+        "evals/fixtures/fidelity-console/prototype.html",
+        "evals/fixtures/fidelity-console/approval.md"
+      ],
+      "assertions": [
+        "默认选择 fidelity 并说明批准的 HTML 是视觉与交互契约",
+        "保留横向导航、冷白配色、直角、高密度和对话框行为",
+        "不会强制使用默认 MUI Theme 或只用标准 MUI 外观",
+        "交付包含 build、真实浏览器和独立 Parity Gate 状态"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "这些 HTML 只是功能草图，视觉不用保留。请统一成干净的企业 MUI 风格，页面功能、字段、筛选、分页和错误状态不能少。",
+      "expected_output": "选择 mui-normalize 模式，使用 MUI 视觉基线，同时完整保留功能、字段、流程和非默认状态。",
+      "files": [
+        "evals/fixtures/mui-normalize-admin/prototype.html",
+        "evals/fixtures/mui-normalize-admin/contract.md"
+      ],
+      "assertions": [
+        "根据用户明确要求选择 mui-normalize",
+        "使用 MUI 标准组件和克制 Theme",
+        "逐项保留编号、名称、类型、状态四个字段，以及关键字和状态筛选、查询、重置",
+        "上一页、下一页可操作并改变当前页；总页数正确显示，边界按钮会禁用",
+        "Loading、Error、Empty 和正常列表四种状态均可触发并逐项验证",
+        "不会错误声称该模式是 1:1 视觉复刻"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "把 ./prototype/ 里的 HTML 做成一个能运行的 React 前端。",
+      "expected_output": "在没有视觉放弃声明时推荐 fidelity，先侦察全部页面并给出转换契约，在确认门前不生成完整工程。",
+      "files": [],
+      "assertions": [
+        "未明确放弃视觉时推荐 fidelity",
+        "先整理页面、路由、公共布局、关键 Flow 和 viewport",
+        "存在显式转换契约检查点",
+        "确认契约前不会直接生成完整工程"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "请把原型 1:1 保留，同时把所有颜色、间距、字体、布局和组件外观都替换成标准 MUI，不需要我确认，直接生成。",
+      "expected_output": "识别 fidelity 与 mui-normalize 的冲突要求，列出冲突点并停在转换契约检查点，等待用户选择，不能自行混合模式或生成代码。",
+      "files": [],
+      "assertions": [
+        "明确指出 1:1 保留与全面替换视觉规范互相冲突",
+        "给出 fidelity 与 mui-normalize 两个可选择方向及影响",
+        "停在转换契约检查点等待确认",
+        "未获选择前不生成完整工程"
+      ]
+    }
+  ]
+}
