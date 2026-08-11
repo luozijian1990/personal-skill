@@ -3,38 +3,69 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "我们做了一个简单资产管理 React mock：资产列表、分页、添加、编辑、删除和详情。团队主要用 Python，只有 2-3 个内部用户，数据不到 1 万条，部署为普通服务器上的单实例 Docker，没有现成数据库和 SSO。请产出可交给 SDD 的技术选型确认单。",
-      "expected_output": "推荐模块化单体 Backend 和 SQLite，不引入 Redis、MQ、Worker、时序数据库；包含日志、健康检查、Secret、迁移与备份等运行基线。",
+      "prompt": "我们做了一个简单资产管理 React mock：资产列表、分页、添加、编辑、删除和详情。团队主要用 Python，只有 2-3 个内部用户，数据不到 1 万条，部署为普通服务器上的单实例 Docker，没有现成数据库和 SSO。现在第一次做技术选型，请先产出 Architecture Draft。",
+      "expected_output": "生成 stack-selection.draft.md：暂定模块化单体 Backend + SQLite，明确 UI 证据、暂定建议和 Grill 输入；不引入 Redis/MQ/Worker/时序库，且不宣告进入 SDD。",
       "files": [],
       "assertions": [
-        "选择模块化单体 Backend，不增加 Worker、Agent 或微服务",
-        "数据库选择 SQLite，或说明同等轻量的单机持久化理由",
-        "明确排除 Redis、MQ 和时序数据库",
-        "说明结构化日志、健康检查、Secret 管理和数据库备份"
+        "阶段明确为 DRAFT，并区分 UI 能力证据、暂定建议和 Grill 输入",
+        "暂定选择模块化单体 Backend 和 SQLite，不增加 Worker、Agent 或微服务",
+        "明确排除 Redis、MQ 和时序数据库并给出升级条件",
+        "不在 Draft 中无证据指定次级库、保留天数、超时或并发数字，聊天只摘要关键结论",
+        "在显式检查点停止，说明完成 Grill 后再 Finalize，当前不能进入 SDD"
       ]
     },
     {
       "id": 2,
-      "prompt": "我们有一个 Python 巡检任务平台 mock：创建巡检任务、查看进度和错误、配置 cron 定时执行。单实例 Docker 部署，10 个内部用户，每个任务通常 3-8 分钟，失败后先由人工查看错误并重试，不要求重启后自动续跑，也没有 Redis 或 MQ。请产出可交给 SDD 的技术选型确认单。",
-      "expected_output": "Backend + Scheduler，初期进程内后台任务，关系库持久化任务状态，前端轮询；只有要求恢复、多实例或自动重试时才拆 Worker 和引入队列。",
-      "files": [],
+      "prompt": "请 Finalize 资产管理平台的 stack-selection.draft.md。Grill 已确认：Python；单实例 Docker；3 个内部用户；数据不到 1 万条；接受 SQLite 文件备份；服务重启时没有后台任务要恢复；认证先用服务端 Session；高风险删除需要后端授权和审计。",
+      "expected_output": "消费 Draft 和 Grill 决策生成 Final：模块化单体 Backend + SQLite，记录决策映射、安全运行基线、排除项和升级条件，然后允许进入 SDD。",
+      "files": [
+        "evals/fixtures/asset-management-draft.md"
+      ],
       "assertions": [
-        "组件包含 Backend + Scheduler，Scheduler 可与 Backend 同进程",
-        "初期使用有界的进程内后台任务，不默认独立 Worker 或任务队列",
-        "任务状态和错误持久化到关系数据库",
-        "前端优先轮询，并给出拆 Worker 和引入队列的升级条件"
+        "阶段明确为 FINAL，并引用 Draft 与 Grill 决策来源",
+        "把确认约束映射到语言、部署、数据、认证、授权和审计结论",
+        "保持最小组件，不默认 Redis、MQ、Worker 或微服务",
+        "最终单包含显式排除和升级条件，并可交给 SDD"
       ]
     },
     {
       "id": 3,
-      "prompt": "我们要做一个 Go 远程主机执行平台：多人选择主机后下发预定义运维命令，并查看 1-2 秒内更新的执行日志。中心服务器能通过 SSH 访问约 200 台主机，任务 1-10 分钟；API 与执行任务需要安全隔离，失败后人工重试，不要求 Agent 本地采集，也没有 Redis/MQ。公司已有 PostgreSQL、SSO 和 Secret 管理系统。请产出可交给 SDD 的技术选型确认单。",
-      "expected_output": "Backend + 独立 Worker，默认不加 Agent；复用 PostgreSQL、SSO、Secret 系统；轮询或 SSE 而非默认 WebSocket；覆盖凭证、白名单、超时、并发、审计和留存。",
+      "prompt": "请 Finalize 一个远程主机执行平台的 Draft。Grill 已确认：语言使用 Go；中心服务器通过 SSH 访问约 200 台主机；任务 1-10 分钟；API 与执行任务必须安全隔离；只允许预定义命令；失败由人工重试，不做自动重试；Worker 重启后从 PostgreSQL 租约恢复未完成任务；不需要 Agent；公司已有 PostgreSQL、SSO 和 Secret 管理；日志 1-2 秒更新即可。",
+      "expected_output": "Final 选择 Backend + 独立 Worker、不加 Agent，复用 PostgreSQL/SSO/Secret，使用轮询或 SSE，不默认 WebSocket/Redis/MQ，并覆盖远程执行安全与审计。",
+      "files": [
+        "evals/fixtures/remote-execution-draft.md"
+      ],
+      "assertions": [
+        "因安全隔离选择 Backend + 独立 Worker，并明确 Agent 不需要",
+        "复用 PostgreSQL、SSO 和 Secret 管理，不默认新增 Redis 或 MQ",
+        "日志选择有依据的轮询或 SSE，不默认 WebSocket",
+        "覆盖命令白名单、凭证、超时、并发、审计、留存和失败恢复"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "巡检任务 React mock 有创建任务、进度、错误和 cron 配置，但还不知道部署是单实例还是多实例，也没确认任务是否要求重启恢复和自动重试。请做第一次技术选型。",
+      "expected_output": "只生成 Draft，把 Backend、Scheduler 和进程内任务作为暂定建议；将部署拓扑、重启恢复、自动重试和重复调度列为 Grill 问题，不提前拆 Worker 或引入队列。",
       "files": [],
       "assertions": [
-        "因安全隔离选择 Backend + 独立 Worker，并说明 Agent 当前不需要",
-        "复用 PostgreSQL、SSO 和现有 Secret 管理，不默认 Redis 或 MQ",
-        "实时日志选择 SSE 或有依据的轮询，不默认 WebSocket",
-        "覆盖凭证管理、命令白名单、超时、并发限制、操作审计和结果留存"
+        "只产出 DRAFT，不把 UI 进度条和 cron 直接翻译成独立 Worker/MQ",
+        "暂定 Backend + Scheduler，并说明可先同进程",
+        "把多实例、任务恢复、自动重试和重复触发列为架构驱动问题",
+        "在 Grill 决策缺失时不生成 Final、不宣告进入 SDD"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "请把资产管理平台的 Draft 直接 Finalize。Grill 目前只确认使用 Python、3 个内部用户；部署位置、备份恢复、认证来源和删除操作的授权审计还没决定。",
+      "expected_output": "关键运行和安全约束仍会改变架构，因此更新 Draft 的 Grill 输入并停止，不生成 Final，也不宣告进入 SDD。",
+      "files": [
+        "evals/fixtures/asset-management-draft.md"
+      ],
+      "assertions": [
+        "识别部署、备份恢复、认证和删除授权审计仍是架构关键未知项",
+        "保持阶段为 DRAFT 并更新待确认问题",
+        "不把推荐默认值伪装成 Grill 已确认决策",
+        "不生成 Final、不宣告进入 SDD"
       ]
     }
   ]
