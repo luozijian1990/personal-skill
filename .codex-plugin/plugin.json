@@ -1,0 +1,35 @@
+{
+  "name": "personal-skill",
+  "version": "0.1.0",
+  "description": "A curated collection of reusable Agent Skills for development, operations, design, testing, and learning workflows.",
+  "author": {
+    "name": "luozijian1990",
+    "url": "https://github.com/luozijian1990"
+  },
+  "homepage": "https://github.com/luozijian1990/personal-skill",
+  "repository": "https://github.com/luozijian1990/personal-skill",
+  "keywords": [
+    "agent-skills",
+    "codex",
+    "development",
+    "operations",
+    "productivity"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Personal Skill Collection",
+    "shortDescription": "Reusable skills for development and operations.",
+    "longDescription": "A curated collection of reusable Agent Skills covering software development, operations, design, browser testing, content workflows, and learning.",
+    "developerName": "luozijian1990",
+    "category": "Productivity",
+    "capabilities": [
+      "Skills"
+    ],
+    "websiteURL": "https://github.com/luozijian1990/personal-skill",
+    "defaultPrompt": [
+      "Help me choose and use a skill for my current task.",
+      "Review this project with the most relevant workflow skill.",
+      "Show me the available development and operations skills."
+    ]
+  }
+}

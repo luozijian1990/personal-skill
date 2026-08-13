@@ -48,7 +48,11 @@ Plugin 模式会一次加载本仓库的全部 Skill，并使用 `personal-skill
 /personal-skill:stack-selector
 ```
 
+### 作为 Codex Plugin 使用
 
+仓库根目录提供 `.codex-plugin/plugin.json`，并通过 `skills/` 暴露全部 Skill，可作为 `personal-skill` Codex Plugin 接入 Codex Marketplace。
+
+本仓库只维护可分发的 Plugin 源码，不会自动修改使用者的个人 Marketplace 配置。安装到 Marketplace 后，请新建 Codex 对话，使新加载的 Skill 生效。
 
 ### 手动使用
 
@@ -206,4 +210,3 @@ git clone https://github.com/luozijian1990/personal-skill.git
 - [zarazhangrui/frontend-slides](https://github.com/zarazhangrui/frontend-slides) — Zara Zhang
 - [JimLiu/baoyu-skills](https://github.com/JimLiu/baoyu-skills) — JimLiu
 - [alchaincyf/darwin-skill](https://github.com/alchaincyf/darwin-skill) — alchaincyf
-
