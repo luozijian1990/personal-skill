@@ -108,6 +108,7 @@ git clone https://github.com/luozijian1990/personal-skill.git
 | [`baoyu-infographic`](skills/baoyu-infographic/)                 | 21×21 布局/风格组合的信息图生成器，从内容反推合适的可视化方案           |
 | [`baoyu-markdown-to-html`](skills/baoyu-markdown-to-html/)       | 把 Markdown 转成内嵌样式的 HTML，适配公众号及外链引用           |
 | [`draw-io-diagram-generator`](skills/draw-io-diagram-generator/) | 生成可直接打开的 draw.io 流程图 / 架构图 / 时序图等            |
+| [`design-taste-frontend`](skills/design-taste-frontend/)         | 为落地页、作品集和网站重设计提供反模板化的前端设计判断与交付约束          |
 | [`frontend-design`](skills/frontend-design/)                     | 生成有设计感的前端组件、页面、海报；避免 AI 默认审美                 |
 | [`frontend-slides`](skills/frontend-slides/)                     | 从零或从 PPT 生成富动画的 HTML 幻灯片                     |
 | [`learning-notes-builder`](skills/learning-notes-builder/)       | 把整理好的材料目录合成结构化中文学习笔记 markdown                |
@@ -205,6 +206,7 @@ git clone https://github.com/luozijian1990/personal-skill.git
 - [mattpocock/skills](https://github.com/mattpocock/skills) — Matt Pocock
 - [anthropics/skills](https://github.com/anthropics/skills) — Anthropic
 - [github/awesome-copilot](https://github.com/github/awesome-copilot) — GitHub
+- [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) — Leonxlnx
 - [microsoft/playwright-cli](https://github.com/microsoft/playwright-cli) — Microsoft
 - [wshobson/agents](https://github.com/wshobson/agents) — Seth Hobson
 - [zarazhangrui/frontend-slides](https://github.com/zarazhangrui/frontend-slides) — Zara Zhang

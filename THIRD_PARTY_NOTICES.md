@@ -52,6 +52,7 @@
 | Skill | 上游仓库 | 上游路径 | 上游分支 | 许可证 | 收录方式 | 主要本地改动 | 上游 LICENSE |
 |---|---|---|---|---|---|---|---|
 | `draw-io-diagram-generator` | `github/awesome-copilot` | `skills/draw-io-diagram-generator/` | main | MIT, Copyright GitHub, Inc. | 原样收录 | 未做内容改动 | `THIRD_PARTY_LICENSES/github-awesome-copilot-LICENSE.txt` |
+| `design-taste-frontend` | `Leonxlnx/taste-skill` | `skills/taste-skill/SKILL.md` | main @ `ccbc15639c97057cbfcf32ecebc38ef716e4bb37` | MIT, Copyright (c) 2026 Leonxlnx | 原样收录 | 从本机已安装副本复制；与所列上游版本字节级一致，未做内容改动 | `THIRD_PARTY_LICENSES/Leonxlnx-taste-skill-LICENSE.txt` |
 | `frontend-design` | `anthropics/skills` | `skills/frontend-design/` | main | Apache-2.0, Copyright Anthropic, PBC | 原样收录（含上游 LICENSE.txt） | 未做内容改动 | `skills/frontend-design/LICENSE.txt`（按上游要求随该 Skill 目录保留） |
 | `frontend-slides` | `zarazhangrui/frontend-slides` | 仓库根目录（`SKILL.md` 位于根） | main | MIT, Copyright (c) 2025 Zara Zhang | 原样收录 | 未做内容改动 | `THIRD_PARTY_LICENSES/zarazhangrui-frontend-slides-LICENSE.txt` |
 | `grafana-dashboards` | `wshobson/agents` | `plugins/observability-monitoring/skills/grafana-dashboards/` | main | MIT, Copyright (c) 2024 Seth Hobson | 原样收录 | 未做内容改动 | `THIRD_PARTY_LICENSES/wshobson-agents-LICENSE.txt` |
